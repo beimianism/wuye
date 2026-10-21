@@ -44,11 +44,14 @@ OAuth 绑定用户返回 `#/pages/…?wAppId=…&authTicket=…`。H5 用 POST `
 ```powershell
 node --test wuye-xcx2/WechatOwnerService-v0.8/test/*.test.cjs
 node scripts/owner-h5/smoke.cjs
+node scripts/owner-h5/layout-smoke.cjs
 ```
 
 浏览器回归使用 `.tools/browser/node_modules/playwright-core` 及系统 Edge。新机器可先安装 `npm install --prefix .tools/browser --no-audit --no-fund playwright-core@1.64.1`；浏览器路径可由 `BROWSER_PATH` 覆盖。`OWNER_H5_URL` 可指定已有测试入口，但入口访问校验需先完成。
 
 该浏览器脚本明确使用合成 API 数据，检查首页、登录、注册、延迟 OAuth 票据交换、房屋、费用查询和不可支付状态，并捕获页面 JavaScript 异常。它曾复现并覆盖混合模块导致首页崩溃、票据交换前查询业主的竞态，以及未配置支付仍可下单的问题。
+
+手机截图曾暴露全局导入 CSS 未转换 upx/rpx、H5 运行时样式未加载的问题。PostCSS 现先通过 `postcss-import` 展开导入，再做 uni-app 转换；HTML 加载编译器实际输出的带 hash 的 `static/index.<hash>.css`。布局回归检查首页和“我的”在 360/390/430px 宽度下的底部导航定位、图标尺寸、菜单触控高度、单位转换和资源请求，并生成本机截图。文本可见或没有脚本异常不能代替这些布局检查。
 
 真实后端登录、绑定、费用数据和微信端授权需另行在本机后端及测试号验证。构建当前只有约 292 KiB 的入口包体积提示；不影响构建成功。工具、node_modules、构建产物和运行配置均不入库。
 

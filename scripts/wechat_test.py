@@ -25,7 +25,7 @@ def read_config():
                            'communityId': '7020181217000001', 'publicBaseUrl': '',
                            'notificationTemplateId': '', 'notificationOpenId': '',
                            'accessCode': secrets.token_urlsafe(24), 'sessionSecret': secrets.token_hex(32),
-                           'gatewayPort': 8080, 'ownerH5Port': 8000})
+                           'gatewayPort': 8080, 'ownerH5Port': 8000, 'tunnelProvider': 'pinggy'})
     return json.loads(CONFIG.read_text(encoding='utf-8-sig'))
 
 
@@ -40,7 +40,10 @@ def public_origin(value):
 
 def tunnel_origin(log):
     announcements = re.findall(r'tunneled with tls termination,\s*(https://[a-zA-Z0-9-]+\.(?:lhr\.life|localhost\.run))', log)
-    return announcements[-1] if announcements else None
+    if announcements:
+        return announcements[-1]
+    pinggy = re.findall(r'https://[a-zA-Z0-9-]+\.free\.pinggy\.net\b', log)
+    return pinggy[-1] if pinggy else None
 
 
 def handoff_html(config, fixture=None):
@@ -59,6 +62,7 @@ def handoff_html(config, fixture=None):
             'pre{padding:16px;background:#f1f5f9;white-space:pre-wrap;overflow-wrap:anywhere;user-select:all}label{font-weight:bold}</style>'
             '<h1>公众号测试号接入配置</h1><p>在微信测试号平台填写前两项并点击提交，再设置网页授权域名（仅域名，无 https:// 或路径）。JS接口安全域名与网页授权域名是不同设置，保存前者不代表后者已保存。</p>'
             + rows + '<p>用手机微信扫码关注该测试号后，在微信内打开测试地址并输入访问码。公众号菜单暂未发布，支付暂未开通。</p>'
+            '<p>Pinggy 免费入口第一次打开可能显示英文确认页，点击 Enter site 后输入访问码。免费连接限时 60 分钟，重连会更换域名，需要重新填写微信平台。</p>'
             '<p>此页只保存在本机，请勿上传到 GitHub。临时隧道重启后域名可能变化，需要重新填写。</p></html>')
 
 
@@ -111,15 +115,18 @@ def stop_tunnel():
                              + "'; if ($p) { $p | Select-Object CommandLine | ConvertTo-Json -Compress }"],
                             capture_output=True, text=True)
     actual = json.loads(result.stdout).get('CommandLine', '') if result.stdout.strip() else ''
-    marker = str((local.RUN / 'wechat-tunnel-known-hosts').resolve())
-    if marker.lower() in actual.lower():
+    markers = [str((local.RUN / name).resolve()) for name in ['wechat-tunnel-known-hosts', 'wechat-pinggy-known-hosts']]
+    if any(marker.lower() in actual.lower() for marker in markers):
         subprocess.run(['taskkill', '/PID', str(state['pid']), '/T', '/F'], capture_output=True)
         print('WeChat SSH tunnel stopped.')
     SSH_STATE.unlink()
 
 
-def tunnel():
+def tunnel(provider=None):
     config = read_config()
+    provider = provider or config.get('tunnelProvider', 'pinggy')
+    if provider not in ('pinggy', 'localhost.run'):
+        raise ValueError('Unsupported tunnel provider')
     port = config.get('gatewayPort', 8080)
     if not local.listening(port):
         raise RuntimeError('Start the restricted ingress first.')
@@ -128,19 +135,22 @@ def tunnel():
     if not ssh:
         raise RuntimeError('Windows OpenSSH client is required.')
     SSH_LOG.parent.mkdir(parents=True, exist_ok=True)
-    command = [ssh, '-p', '22', '-o', 'StrictHostKeyChecking=accept-new', '-o',
+    command = [ssh, '-p', '443' if provider == 'pinggy' else '22', '-o', 'StrictHostKeyChecking=accept-new', '-o',
                'UserKnownHostsFile=' + str((local.RUN / 'wechat-tunnel-known-hosts').resolve()),
                '-o', 'ServerAliveInterval=30', '-o', 'ConnectTimeout=20', '-o', 'ExitOnForwardFailure=yes',
-               '-T', '-R', f'80:127.0.0.1:{port}', 'nokey@localhost.run']
+               '-T', '-R', f'{0 if provider == "pinggy" else 80}:127.0.0.1:{port}',
+               'free.pinggy.io' if provider == 'pinggy' else 'nokey@localhost.run']
     with SSH_LOG.open('wb') as output:
         process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=output, stderr=output,
                                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS)
-    local.save(SSH_STATE, {'pid': process.pid, 'command': command})
+    local.save(SSH_STATE, {'pid': process.pid, 'command': command, 'provider': provider})
     deadline = time.monotonic() + 45
     while time.monotonic() < deadline:
         text = SSH_LOG.read_text(encoding='utf-8', errors='replace')
         origin = tunnel_origin(text)
         if origin:
+            config['tunnelProvider'] = provider
+            local.save(CONFIG, config)
             set_public(origin)
             return
         if process.poll() is not None:
@@ -153,12 +163,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=['init', 'start', 'tunnel', 'set-public', 'handoff', 'status', 'stop'])
     parser.add_argument('url', nargs='?')
+    parser.add_argument('--provider', choices=['pinggy', 'localhost.run'])
     args = parser.parse_args()
     if args.action == 'init':
         read_config()
         print('Local configuration: ' + str(CONFIG))
     elif args.action == 'set-public':
         set_public(args.url or '')
+    elif args.action == 'tunnel':
+        tunnel(args.provider)
     elif args.action == 'stop':
         stop_tunnel()
         local.stop(['wechat-gateway', 'owner-h5'])
