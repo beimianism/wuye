@@ -1,0 +1,372 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "HC掌上物业"
+			}
+		}
+	    ,{
+            "path" : "pages/addressList/addressList",
+            "style" : {
+				"navigationBarTitleText": "通讯录"
+			}
+        }
+        ,{
+            "path" : "pages/my/my",
+            "style" : {
+				"navigationBarTitleText": "我的"
+			}
+        }
+        ,{
+            "path" : "pages/login/login",
+            "style" : {
+				// "navigationBarTitleText": "请登录"
+				"app-plus": {
+					"titleNView": false,
+					"bounce": "none",
+					"scrollIndicator": "none"
+				},
+				"navigationStyle": "custom"
+				
+			}
+        }
+        ,{
+            "path" : "pages/activityes/activityes",
+            "style" : {
+				"navigationBarTitleText": "小区文化"
+			}
+        }
+        ,{
+            "path" : "pages/activityDetail/activityDetail",
+            "style" : {
+				"navigationBarTitleText": "文化详情"
+			}
+        }
+        ,{
+            "path" : "pages/notice/notice",
+            "style" : {
+            	"navigationBarTitleText": "公告"
+            }
+        }
+        ,{
+            "path" : "pages/changeCommunity/changeCommunity",
+            "style" : {
+				"navigationBarTitleText": "切换小区"
+			}
+        }
+        ,{
+            "path" : "pages/userInfo/userInfo",
+            "style" : {
+				"navigationBarTitleText": "个人信息"
+			}
+        }
+        ,{
+            "path" : "pages/changePwd/changePwd",
+            "style" : {
+				"navigationBarTitleText": "修改密码"
+			}
+        }
+        ,{
+            "path" : "pages/notice/detail/noticeDetail",
+            "style" : {
+				"navigationBarTitleText": "通知页面详情"
+				}
+        }
+        ,{
+            "path" : "pages/complaintList/complaintList",
+            "style" : {
+				"navigationBarTitleText": "投诉受理单"
+			}
+        }
+        ,{
+            "path" : "pages/auditComplaintOrder/auditComplaintOrder",
+            "style" : {
+				"navigationBarTitleText": "处理投诉单"
+			}
+        }
+        ,{
+            "path" : "pages/complaintOrderDetail/complaintOrderDetail",
+            "style" : {
+				"navigationBarTitleText": "投诉单详情"
+			}
+        }
+        ,{
+            "path" : "pages/complaintOrder/complaintOrder",
+            "style" : {
+				"navigationBarTitleText": "投诉录单"
+			}
+        }
+        ,{
+            "path" : "pages/floorList/floorList",
+            "style" : {
+				"navigationBarTitleText": "选择楼栋"
+			}
+        }
+        ,{
+            "path" : "pages/unitList/unitList",
+            "style" : {
+				"navigationBarTitleText": "选择单元"
+			}
+        }
+        ,{
+            "path" : "pages/roomList/roomList",
+            "style" : {
+				"navigationBarTitleText": "选择房屋"
+			}
+        },
+		{
+		    "path" : "pages/repairOrder/repairOrder",
+		    "style" : {
+				"navigationBarTitleText": "维修工单池"
+			}
+		},
+		{
+		    "path" : "pages/repairDispatch/repairDispatch",
+		    "style" : {
+				"navigationBarTitleText": "维修待办单"
+			}
+		},
+		{
+		    "path" : "pages/repairDetail/repairDetail",
+		    "style" : {
+				"navigationBarTitleText": "维修详情"
+			}
+		}
+		,{
+		    "path" : "pages/repairAdd/repairAdd",
+		    "style" : {
+				"navigationBarTitleText": "添加记录"
+			}
+		}
+        ,{
+            "path" : "pages/inspection/inspection",
+            "style" : {
+				"navigationBarTitleText": "巡检打卡"
+				
+			}
+        }
+        ,{
+            "path" : "pages/purchase/purchase",
+            "style" : {
+				"navigationBarTitleText": "采购管理",
+				"navigationBarBackgroundColor":"#57fef6"
+			}
+        }
+        ,{
+            "path" : "pages/excuteInspection/excuteInspection",
+            "style" : {
+				"navigationBarTitleText": "巡检过程"
+			}
+        }
+        ,{
+            "path" : "pages/excuteOneInspection/excuteOneInspection",
+            "style" : {
+				"navigationBarTitleText": "执行巡检"
+			}
+        },{
+            "path" : "pages/purchaseRequest/purchaseRequest",
+            "style" : {
+				"navigationBarTitleText": "采购申请"
+			}
+        }
+        ,{
+            "path" : "pages/pOutOfStorageRequest/pOutOfStorageRequest",
+            "style" : {
+				"navigationBarTitleText": "出库申请"
+			}
+        }
+        ,{
+            "path" : "pages/purchasingSchedule/purchasingSchedule",
+            "style" : {
+				"navigationBarTitleText": "申请进度"
+			}
+        }
+        ,{
+            "path" : "pages/purchaseReview/purchaseReview",
+            "style" : {
+				"navigationBarTitleText": "采购审核"
+			}
+        }
+        ,{
+            "path" : "pages/purchaseList/purchaseList",
+            "style" : {
+				"navigationBarTitleText": "选择类型"
+			}
+        }
+        ,{
+            "path" : "pages/repairHandle/repairHandle",
+            "style" : {
+				"navigationBarTitleText": "订单处理"
+			}
+        }
+        ,{
+            "path" : "pages/repairDispatchFinish/repairDispatchFinish",
+            "style" : {
+				"navigationBarTitleText": "维修已办"
+				
+			}
+        }
+        ,{
+            "path" : "pages/appraiseRepair/appraiseRepair",
+            "style" : {
+				"navigationBarTitleText": "回访工单"
+			}
+        }
+        ,{
+            "path" : "pages/complaintFinish/complaintFinish",
+            "style" : {
+				"navigationBarTitleText": "投诉已办单"
+			}
+        }
+        ,{
+            "path" : "pages/complaintHandle/complaintHandle",
+            "style" : {
+				"navigationBarTitleText": "投诉处理"	
+			}
+        }
+        ,{
+            "path" : "pages/roomDetail/roomDetail",
+            "style" : {
+				"navigationBarTitleText": "房产信息"
+			}
+        }
+        ,{
+            "path" : "pages/selectFloor/selectFloor",
+            "style" : {
+				"navigationBarTitleText": "选择楼栋"
+				
+			}
+        }
+        ,{
+            "path" : "pages/selectUnit/selectUnit",
+            "style" : {
+				"navigationBarTitleText": "选择单元"
+				
+			}
+        }
+        ,{
+            "path" : "pages/selectRoom/selectRoom",
+            "style" : {
+				"navigationBarTitleText": "选择房屋"
+			}
+        }
+        ,{
+            "path" : "pages/feeDetail/feeDetail",
+            "style" : {
+				"navigationBarTitleText": "费用详情"
+			}
+        }
+        ,{
+            "path" : "pages/roomPayFee/roomPayFee",
+            "style" : {
+				"navigationBarTitleText": "收银台"
+			}
+        },
+		{
+		    "path" : "pages/meterReading/meterReading",
+		    "style" : {
+				"navigationBarTitleText": "水电抄表"
+			}
+		},
+		{
+		    "path" : "pages/addmeter/addmeter",
+		    "style" : {
+				"navigationBarTitleText": "抄表"
+			}
+		},
+		{
+		    "path" : "pages/applyRoom/applyRoom",
+		    "style" : {
+				"navigationBarTitleText": "空置房"
+			}
+		},
+		{
+		    "path" : "pages/applyRoomDetail/applyRoomDetail",
+		    "style" : {
+				"navigationBarTitleText": "空置房详情"
+			}
+		},
+		{
+		    "path" : "pages/roomRenovation/roomRenovation",
+		    "style" : {
+				"navigationBarTitleText": "装修记录"
+			}
+		},
+		{
+		    "path" : "pages/roomRenovationDetail/roomRenovationDetail",
+		    "style" : {
+				"navigationBarTitleText": "装修详情"
+			}
+		},
+		{
+		    "path" : "pages/roomRenovationRecord/roomRenovationRecord",
+		    "style" : {
+				"navigationBarTitleText": "跟踪记录"
+			}
+		},
+		{
+		    "path" : "pages/roomRenovationRecordHandle/roomRenovationRecordHandle",
+		    "style" : {
+				"navigationBarTitleText": "添加跟踪记录"
+			}
+		},
+		{
+		    "path" : "pages/roomRenovationRecordDetail/roomRenovationRecordDetail",
+		    "style" : {
+				"navigationBarTitleText": "跟踪记录详情"
+			}
+		}
+        ,{
+            "path" : "pages/payFeeByQrCode/payFeeByQrCode",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "请扫二维码支付",
+                "enablePullDownRefresh": false
+            }
+        },
+		{
+		    "path" : "pages/resourceStoreManage/resourceStoreManage",
+		    "style" : {
+				"navigationBarTitleText": "我的物品"
+			}
+		}
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "HC掌上物业",
+		"navigationBarBackgroundColor": "#00AA00",
+		"backgroundColor": "#00AA00"
+	},
+	"tabBar": {
+		"color": "#272636",
+		"selectedColor": "#00AA00",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"height": "50px",
+		"fontSize": "10px",
+		"iconWidth": "24px",
+		"spacing": "3px",
+		"list": [{
+			"pagePath": "pages/index/index",
+			"iconPath": "static/image/home.png",
+			"selectedIconPath": "static/image/home-selected.png",
+			"text": "首页"
+		}, {
+			"pagePath": "pages/addressList/addressList",
+			"iconPath": "static/image/addressList.png",
+			"selectedIconPath": "static/image/addressList-selected.png",
+			"text": "通讯录"
+		},
+		{
+			"pagePath": "pages/my/my",
+			"iconPath": "static/image/my.png",
+			"selectedIconPath": "static/image/my-selected.png",
+			"text": "我的"
+		}
+		]
+	},
+	"networkTimeout": {
+		"request": 10000
+	}
+}

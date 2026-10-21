@@ -1,0 +1,36 @@
+# Dependencies and build output
+node_modules/
+target/
+unpackage/
+*.class
+
+# Project-local tools, services and data
+/.runtime/
+/.tools/
+/.local/
+/logs/
+*.log
+*.pid
+*.pid.lock
+
+# Local secrets and machine configuration
+.env
+.env.local
+.env.*.local
+*.local.yml
+*.local.yaml
+*.local.properties
+
+# IDE and operating system files
+.idea/
+.vscode/
+.hbuilderx/
+*.iml
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary work files
+*.tmp
+*.swp
+*.swo
