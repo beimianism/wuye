@@ -1,0 +1,23 @@
+[
+  {
+    "id": "local_20261021_001",
+    "code": "/communitys/queryStoreCommunitys",
+    "url": "http://community-service",
+    "method": "GET",
+    "apps": [
+      "8000418004"
+    ],
+    "reason": "0.8 GetCommunityStoreInfoSMOImpl calls CommunitysApi; the 0.6 dump lacks its service/route registration."
+  },
+  {
+    "id": "local_20261021_002",
+    "code": "api.getListPayFee",
+    "url": "http://common-service/businessApi/query",
+    "method": "GET",
+    "apps": [
+      "8000418004"
+    ],
+    "instance": "NT",
+    "reason": "0.8 ListPayFeeSMOImpl requests api.getListPayFee for all types; 0.6 dump only contains separate property/parking reports."
+  }
+]

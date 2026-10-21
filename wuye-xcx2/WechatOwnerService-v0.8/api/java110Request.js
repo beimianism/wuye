@@ -1,3 +1,4 @@
+import localFeatures from '../config/local-features.js';
 import coreUtil from '../utils/CoreUtil.js'
 
 import app from '../constant/AppConstant.js'
@@ -48,6 +49,7 @@ export function getHeaders() {
  * http 请求 加入是否登录判断
  */
 export function request(_reqObj) {
+	if (localFeatures.blockRequest(_reqObj)) return;
 	
 	debug('java110Request','request',_reqObj);
 	
@@ -117,6 +119,7 @@ export function request(_reqObj) {
  * @param {Object} _reqObj 请求参数
  */
 export function requestNoAuth(_reqObj) {
+	if (localFeatures.blockRequest(_reqObj)) return;
 	debug('java110Request','requestNoAuth',_reqObj);
 	//这里判断只有在 post 方式时 放加载框
 	if (_reqObj.hasOwnProperty("method") && "POST" == _reqObj.method) {

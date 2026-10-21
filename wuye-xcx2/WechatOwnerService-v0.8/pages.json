@@ -1,5 +1,6 @@
 {
-	"pages": [{
+	"pages": [
+		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "HC智慧家园",
@@ -32,36 +33,6 @@
 			}
 		},
 		{
-			"path": "pages/applicationKeyLocation/applicationKeyLocation",
-			"style": {
-				"navigationBarTitleText": "相关门禁"
-			}
-		},
-		{
-			"path": "pages/applicationKeyUser/applicationKeyUser",
-			"style": {
-				"navigationBarTitleText": "填写信息"
-			}
-		},
-		{
-			"path": "pages/applicationKeyProgress/applicationKeyProgress",
-			"style": {
-				"navigationBarTitleText": "钥匙进度"
-			}
-		},
-		{
-			"path": "pages/myApplicationKey/myApplicationKey",
-			"style": {
-				"navigationBarTitleText": "我的钥匙"
-			}
-		},
-		{
-			"path": "pages/visitorApplicationKey/visitorApplicationKey",
-			"style": {
-				"navigationBarTitleText": "访客钥匙"
-			}
-		},
-		{
 			"path": "pages/location/location",
 			"style": {
 				"navigationBarTitleText": "选择小区",
@@ -69,44 +40,10 @@
 			}
 		},
 		{
-			"path": "pages/openDoor/openDoor",
-			"style": {
-				"navigationBarTitleText": "开门"
-			}
-		},
-		{
 			"path": "pages/my/my",
 			"style": {
 				"navigationBarTitleText": "我"
 			}
-		},
-		{
-			"path": "pages/notice/index",
-			"style": {
-				"navigationBarTitleText": "公告"
-			}
-		},
-		{
-			"path": "pages/notice/detail/detail",
-			"style": {
-				"navigationBarTitleText": "公告详情"
-			}
-		},
-		{
-			"path": "pages/repairList/repairList",
-			"style": {
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/repair/repair",
-			"style": {
-				"navigationBarTitleText": "报修"
-			}
-		},
-		{
-			"path": "pages/repairList/detail/detail",
-			"style": {}
 		},
 		{
 			"path": "pages/family/family",
@@ -121,29 +58,6 @@
 				"navigationBarTitleText": "家庭成员"
 
 			}
-		},
-		{
-			"path": "pages/complaintList/complaintList",
-			"style": {
-				"enablePullDownRefresh": true,
-				"navigationBarTitleText": "投诉建议"
-			}
-		},
-		{
-			"path": "pages/viewApplicationKeyUser/viewApplicationKeyUser",
-			"style": {
-				"navigationBarTitleText": "我的钥匙"
-			}
-		},
-		{
-			"path": "pages/complaint/complaint",
-			"style": {
-				"navigationBarTitleText": "投诉建议"
-			}
-		},
-		{
-			"path": "pages/viewComplaint/viewComplaint",
-			"style": {}
 		},
 		{
 			"path": "pages/payParkingFeeList/payParkingFeeList",
@@ -164,18 +78,6 @@
 			}
 		},
 		{
-			"path": "pages/activites/activites",
-			"style": {
-				"navigationBarTitleText": "小区文化"
-			}
-		},
-		{
-			"path": "pages/activitesDetail/activitesDetail",
-			"style": {
-				"navigationBarTitleText": "详情"
-			}
-		},
-		{
 			"path": "pages/roomFeeList/roomFeeList",
 			"style": {
 				"navigationBarTitleText": "物业费"
@@ -192,54 +94,56 @@
 			"style": {
 				"navigationBarTitleText": "缴物业费"
 			}
-		}, {
+		},
+		{
 			"path": "pages/login/login",
 			"style": {
 				"navigationBarTitleText": "请登录"
 			}
-		}, {
-			"path": "pages/myRepair/myRepair",
-			"style": {
-				"navigationBarTitleText": "我的报修单"
-			}
-		}, {
+		},
+		{
 			"path": "pages/settings/settings",
 			"style": {
 				"navigationBarTitleText": "设置"
 			}
-		}, {
+		},
+		{
 			"path": "pages/register/register",
 			"style": {
 				"navigationBarTitleText": "绑定业主"
 			}
-		}, {
+		},
+		{
 			"path": "pages/payFeeDetail/payFeeDetail",
 			"style": {
 				"navigationBarTitleText": "缴费历史"
 			}
-		}, {
+		},
+		{
 			"path": "pages/myProperty/myProperty",
 			"style": {
 				"navigationBarTitleText": "我的物业"
 			}
-		}
-
-		, {
+		},
+		{
 			"path": "pages/viewAdmin/viewAdmin",
 			"style": {
 				"navigationBarTitleText": "技术支持"
 			}
-		}, {
+		},
+		{
 			"path": "pages/market/market",
 			"style": {
 				"navigationBarTitleText": "跳蚤市场"
 			}
-		}, {
+		},
+		{
 			"path": "pages/newJunk/newJunk",
 			"style": {
 				"navigationBarTitleText": "发布信息"
 			}
-		}, {
+		},
+		{
 			"path": "pages/myJunk/myJunk",
 			"style": {
 				"navigationBarTitleText": "我的发布"
@@ -250,65 +154,39 @@
 			"style": {
 				"navigationBarTitleText": "温馨提示"
 			}
-		}
-
-		, {
+		},
+		{
 			"path": "pages/selectFloor/selectFloor",
 			"style": {
 				"navigationBarTitleText": "选择楼栋"
 			}
-		}, {
+		},
+		{
 			"path": "pages/selectUnit/selectUnit",
 			"style": {
 				"navigationBarTitleText": "选择单元"
 			}
-		}, {
-			"path": "pages/repairDetail/repairDetail",
-			"style": {
-				"navigationBarTitleText": "工单详情"
-			}
-		}, {
-			"path": "pages/appraiseRepair/appraiseRepair",
-			"style": {
-				"navigationBarTitleText": "工单评价"
-			}
-		}, {
-
-			"path": "pages/repairPay/repairPay",
-			"style": {
-				"navigationBarTitleText": "报修支付"
-			}
-		}, {
-			"path": "pages/complaintDetail/complaintDetail",
-			"style": {
-				"navigationBarTitleText": "投诉详情"
-			}
-		}, {
-			"path": "pages/complaintHandle/complaintHandle",
-			"style": {
-				"navigationBarTitleText": "投诉待办"
-			}
-		}
-	    ,{
+		},
+		{
             "path" : "pages/registerByWechat/registerByWechat",
             "style" : {
 				"navigationBarTitleText": "业主绑定"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/changePassword/changePassword",
             "style" : {
 				"navigationBarTitleText": "修改密码"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/changeOwnerPhone/changeOwnerPhone",
             "style" : {
 				"navigationBarTitleText": "修改手机"
 				
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/hireRoom/hireRoom",
             "style" : {
 				"navigationBarTitleText": "房屋出租"
@@ -320,7 +198,8 @@
 				"enablePullDownRefresh": true,
 				"navigationBarTitleText": "房源"
 			}
-		},{
+		},
+		{
             "path" : "pages/rentingDetail/rentingDetail",
             "style" : {
 				"navigationBarTitleText": ""
@@ -331,8 +210,8 @@
 		    "style" : {
 				"navigationBarTitleText": "车位申请"
 			}
-		}
-        ,{
+		},
+		{
             "path" : "pages/roomOweFee/roomOweFee",
             "style" : {
 				"navigationBarTitleText": "欠费缴费"
@@ -343,22 +222,20 @@
 		    "style" : {
 				"navigationBarTitleText": "车位申请进度"
 			}
-		}
-        
-        ,{
+		},
+		{
             "path" : "pages/rentingAppointment/rentingAppointment",
             "style" : {
 				"navigationBarTitleText": "租房预约"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/mall/mall",
             "style" : {
 				"navigationBarTitleText": "商圈",
 				"navigationStyle":"custom"
 			}
-        }
-       ,
+        },
 		{
 		    "path" : "pages/applyRoom/applyRoom",
 		    "style" :                                                                                    
@@ -367,8 +244,8 @@
 		        "enablePullDownRefresh": false
 		    }
 		    
-		}
-		,{
+		},
+		{
 		    "path" : "pages/applyRoomDetail/applyRoomDetail",
 		    "style" :                                                                                    
 		    {
@@ -376,8 +253,8 @@
 		        "enablePullDownRefresh": false
 		    }
 		    
-		}
-		,{
+		},
+		{
 		    "path" : "pages/roomRenovation/roomRenovation",
 		    "style" :                                                                                    
 		    {
@@ -385,8 +262,8 @@
 		        "enablePullDownRefresh": false
 		    }
 		    
-		}
-		,{
+		},
+		{
 		    "path" : "pages/roomRenovationDetail/roomRenovationDetail",
 		    "style" :                                                                                    
 		    {
@@ -394,8 +271,8 @@
 		        "enablePullDownRefresh": false
 		    }
 		    
-		}
-		,{
+		},
+		{
 		    "path" : "pages/myRenovation/myRoomList",
 		    "style" :                                                                                    
 		    {
@@ -403,8 +280,8 @@
 		        "enablePullDownRefresh": false
 		    }
 		    
-		}
-		,{
+		},
+		{
 		    "path" : "pages/myRenovation/myRoomRenovationList",
 		    "style" :                                                                                    
 		    {
@@ -412,8 +289,8 @@
 		        "enablePullDownRefresh": false
 		    }
 		    
-		}
-		,{
+		},
+		{
 		    "path" : "pages/myRenovation/myRoomRenovationDetail",
 		    "style" :                                                                                    
 		    {
@@ -421,24 +298,24 @@
 		        "enablePullDownRefresh": false
 		    }
 		    
-		}
-		,{
+		},
+		{
 			"path" : "pages/myRoomRenovationRecord/myRoomRenovationRecord",
 			"style" :                                                                                    
 			{
 			    "navigationBarTitleText": "跟踪记录",
 			    "enablePullDownRefresh": false
 			}
-		}
-		,{
+		},
+		{
 			"path" : "pages/myRoomRenovationRecordDetail/myRoomRenovationRecordDetail",
 			"style" :                                                                                    
 			{
 			    "navigationBarTitleText": "跟踪记录详情",
 			    "enablePullDownRefresh": false
 			}
-		}
-        ,{
+		},
+		{
             "path" : "pages/carOweFee/carOweFee",
             "style" :                                                                                    
             {
@@ -446,8 +323,8 @@
                 "enablePullDownRefresh": false
             }
             
-        }
-        ,{
+        },
+		{
             "path" : "pages/tempParkingFee/tempParkingFee",
             "style" :                                                                                    
             {
@@ -455,8 +332,8 @@
                 "enablePullDownRefresh": false
             }
             
-        }
-        ,{
+        },
+		{
             "path" : "pages/contractFee/contractFee",
             "style" :                                                                                    
             {
@@ -464,8 +341,8 @@
                 "enablePullDownRefresh": false
             }
             
-        }
-        ,{
+        },
+		{
             "path" : "pages/contractFeeList/contractFeeList",
             "style" :                                                                                    
             {
@@ -473,8 +350,8 @@
                 "enablePullDownRefresh": false
             }
             
-        }
-        ,{
+        },
+		{
             "path" : "pages/contractOweFee/contractOweFee",
             "style" :                                                                                    
             {
@@ -482,8 +359,8 @@
                 "enablePullDownRefresh": false
             }
             
-        }
-        ,{
+        },
+		{
             "path" : "pages/questionAnswer/questionAnswer",
             "style" :                                                                                    
             {
@@ -491,8 +368,8 @@
                 "enablePullDownRefresh": false
             }
             
-        }
-        ,{
+        },
+		{
             "path" : "pages/questionAnswerDetail/questionAnswerDetail",
             "style" :                                                                                    
             {
@@ -500,17 +377,8 @@
                 "enablePullDownRefresh": false
             }
             
-        }
-        ,{
-            "path" : "pages/machineTranslateLog/machineTranslateLog",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "门禁同步日志",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
+        },
+		{
             "path" : "pages/hcWebView/hcWebView",
             "style" :                                                                                    
             {
@@ -519,8 +387,8 @@
 				"navigationStyle":"custom"
             }
             
-        }
-        ,{
+        },
+		{
             "path" : "pages/hcWebViewRefresh/hcWebViewRefresh",
             "style" :                                                                                    
             {
@@ -529,8 +397,8 @@
 				"navigationStyle":"custom"
             }
             
-        }
-        ,{
+        },
+		{
             "path" : "pages/homemaking/homemaking",
             "style" :                                                                                    
             {
@@ -540,7 +408,7 @@
             }
             
         }
-    ],
+	],
 	"tabBar": {
 		"color": "#272636",
 		"selectedColor": "#00AA00",

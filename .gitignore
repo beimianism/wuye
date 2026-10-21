@@ -3,6 +3,8 @@ node_modules/
 target/
 unpackage/
 *.class
+__pycache__/
+*.pyc
 
 # Project-local tools, services and data
 /.runtime/

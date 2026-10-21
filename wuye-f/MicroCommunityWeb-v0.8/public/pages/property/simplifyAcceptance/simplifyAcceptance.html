@@ -164,21 +164,6 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
-                       v-bind:class="{active:simplifyAcceptanceInfo._currentTab == 'simplifyOwnerRepair'}"
-                       v-on:click="changeTab('simplifyOwnerRepair')">报修单</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link"
-                       v-bind:class="{active:simplifyAcceptanceInfo._currentTab == 'simplifyOwnerComplaint'}"
-                       v-on:click="changeTab('simplifyOwnerComplaint')">投诉单</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link"
-                       v-bind:class="{active:simplifyAcceptanceInfo._currentTab == 'simplifyOwnerAccessContol'}"
-                       v-on:click="changeTab('simplifyOwnerAccessContol')">门禁同步</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link"
                        v-bind:class="{active:simplifyAcceptanceInfo._currentTab == 'simplifyOwnerTransactionCar'}"
                        v-on:click="changeTab('simplifyOwnerTransactionCar')">道闸同步</a>
                 </li>
@@ -210,15 +195,6 @@
         <div v-if="simplifyAcceptanceInfo._currentTab == 'simplifyOwnerCar'">
             <vc:create path="property/simplifyOwnerCar"></vc:create>
         </div>
-        <div v-if="simplifyAcceptanceInfo._currentTab == 'simplifyOwnerRepair'">
-            <vc:create path="property/simplifyOwnerRepair"></vc:create>
-        </div>
-        <div v-if="simplifyAcceptanceInfo._currentTab == 'simplifyOwnerComplaint'">
-            <vc:create path="property/simplifyOwnerComplaint"></vc:create>
-        </div>
-        <div v-if="simplifyAcceptanceInfo._currentTab == 'simplifyOwnerAccessContol'">
-            <vc:create path="property/simplifyOwnerAccessContol"></vc:create>
-        </div>
         <div v-if="simplifyAcceptanceInfo._currentTab == 'simplifyOwnerTransactionCar'">
             <vc:create path="property/simplifyOwnerTransactionCar"></vc:create>
         </div>
@@ -243,5 +219,4 @@
     <vc:create path="property/addProxyFee" callBackListener="" callBackFunction=""></vc:create>
     <vc:create path="property/searchRoom" emitChooseRoom="simplifyAcceptance" emitLoadData="list" roomFlag="1"
                showSearchCondition="false"></vc:create>
-    <vc:create path="property/editMachineTranslate"></vc:create>
 </div>

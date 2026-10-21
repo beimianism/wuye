@@ -1,3 +1,4 @@
+import localFeatures from '../../config/local-features.js';
 /**
  * 首页相关 数据封装API
  * add by 吴学文 2020-09-07
@@ -46,7 +47,7 @@ export function getActivitiTitle(dataObj) {
  * 查询 目录列表
  */
 export function getCategoryList() {
-	return {
+	return localFeatures.filterMenuPages({
 		pageone: [{
 			name: "物业费",
 			src: "/static/images/index_property.png",
@@ -117,7 +118,7 @@ export function getCategoryList() {
 			}
 			
 		]
-	};
+	});
 }
 
 

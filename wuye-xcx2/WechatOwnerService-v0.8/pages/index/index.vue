@@ -28,40 +28,6 @@
 			</swiper>
 
 
-			<swiper class="ad-swiper bg-white" indicator-dots="true" indicator-color="rgba(228,228,228,1)"
-			 indicator-active-color="#FECA49" autoplay="true" interval="5000" duration="1000" circular="true">
-				<block v-for="(item, index) in ad" :key="index">
-					<swiper-item>
-						<image :src="item.url"></image>
-					</swiper-item>
-				</block>
-			</swiper>
-
-			<scroll-view scroll-x class="bg-white nav" scroll-with-animation :scroll-left="scrollLeft">
-				<view class="cu-item" :class="item.typeCd==curTypeCd?'text-green cur':''" v-for="(item,index) in activitiTitle"
-				 :key="index" @tap="selectActiviti(item)" :data-id="index">
-					{{item.typeName}}
-				</view>
-			</scroll-view>
-			<view class="noticesList bg-white margin-top-1">
-				<block v-for="(item,index) in notices" :key="index" wx:key="index">
-					<view class="noticesList-list" @tap="_toDetail(item)">
-						<view class="notices-info">
-							<view class="notices-info-name">{{item.title}}</view>
-
-							<view class="notice-bottom">
-								<view>
-									<text class="lg text-gray cuIcon-time"></text>
-									<text class="notice-startTime margin-left-xs">{{item.startTime}}</text>
-								</view>
-							</view>
-						</view>
-						<view class="notices-info-image">
-							<image :src="item.src" />
-						</view>
-					</view>
-				</block>
-			</view>
 
 		</scroll-view>
 		<view class="cu-modal" :class="callPropertyModal==true?'show':''">
@@ -86,7 +52,7 @@
 
 <script>
 	import uniNoticeBar from '@/components/uni-notice-bar/uni-notice-bar.vue'
-	import {getActivitiTitle,getCategoryList,loadActivites,loadAdverts} from '../../api/index/indexApi.js'
+	import {getCategoryList} from '../../api/index/indexApi.js'
 	import {getProperty} from '../../api/property/propertyApi.js'
 
 	import {getCurOwner} from '../../api/owner/ownerApi.js'
@@ -98,12 +64,6 @@
 				communityId: '',
 				property: {},
 				callPropertyModal: false,
-				ad: [],
-				notices: [],
-				page: 1,
-				row: 7,
-				activitiTitle: [],
-				curTypeCd: '',
 				categoryList: {},
 				selected: 0,
 				mask1Hidden: true,
@@ -154,20 +114,9 @@
 			if (hasLogin()) {
 				_that.judgeBindOwnerFun();
 			}
-			_that.notices = [];
-			_that.ad = [];
 			this._initIndexData();
 		},
 
-		/**
-		 * 页面上拉触底事件的处理函数
-		 */
-		onReachBottom: function() {
-			if (this.notices.length >= this.page * this.row) {
-				this.page = this.page + 1;
-				this._loadActivites();
-			}
-		},
 		methods: {
 			_initIndexData: function() {
 				let _that = this;
@@ -176,77 +125,12 @@
 				.then(function(_communityInfo){
 					_that.communityId = _communityInfo.communityId;
 					//查询小区活动信息
-					_that._loadAdvertPhoto();
-				})
-				.then(function(){
-					_that._loadActivitiesType();
-				})
-			},
-			_loadActivitiesType:function(){
-				let _that = this;
-				let _objData = {
-					page: 1,
-					row: 10,
-					communityId: _that.communityId,
-					defaultShow:'Y' 
-				};
-				//查询 活动标题
-				getActivitiTitle(_objData)
-				.then((actType)=>{
-					_that.activitiTitle = actType;
 
-				})
-				.then((acts)=>{
-					if(_that.activitiTitle.length > 0){
-						_that.curTypeCd = _that.activitiTitle[0].typeCd;
-					}
-					_that._loadActivites();
 				})
 			},
 			judgeBindOwnerFun: function() {
 				//查询业主
 				getCurOwner();
-			},
-			/**
-			 * 加载活动
-			 * 第一次加载是可能没有小区 则直接下载固定小区
-			 *
-			 */
-			_loadActivites: function() {
-				let _that = this;
-				if(this.curTypeCd == ''){
-					return ;
-				}
-				let _objData = {
-					page: this.page,
-					row: this.row,
-					communityId: this.communityId,
-					typeCd: this.curTypeCd
-				};
-				//加载活动
-				loadActivites(_objData)
-				.then(function(_acts){
-					_that.notices = _that.notices.concat(_acts);
-				});
-			},
-			_loadAdvertPhoto: function() {
-				let _that = this;
-				let _objData = {
-					page: 1,
-					row: 5,
-					locationTypeCd:'2000',
-					viewType:'8888'
-				};
-				//查询 广告
-				loadAdverts(_objData)
-				.then(function(_aPhotos){
-					_that.ad = _aPhotos;
-				});
-			},
-			moreActivitiesFun: function() {
-				this.vc.navigateTo({
-					url: '/pages/activites/activites'
-				});
 			},
 			showModal: function(e) {
 				this.vc.navigateTo({
@@ -285,20 +169,8 @@
 					}
 				});
 			},
-			_toDetail: function(_item) {
-				this.vc.navigateTo({
-					url: '/pages/activitesDetail/activitesDetail?activitiesId=' + _item.activitiesId + '&title=' + _item.title +
-						'&communityId=' + _item.communityId
-				});
-			},
 			_cancleCall: function() {
 				this.callPropertyModal = false;
-			},
-			selectActiviti: function(_item) {
-				this.curTypeCd = _item.typeCd;
-				this.notices = [];
-				this.page = 1;
-				this._loadActivites();
 			},
 			toPage: function(pageUrl) {
 				this.vc.navigateTo({

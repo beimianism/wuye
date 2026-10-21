@@ -18,6 +18,7 @@ import com.java110.utils.constant.ServiceCodeConstant;
 import com.java110.utils.exception.SMOException;
 import com.java110.utils.util.Assert;
 import com.java110.utils.util.BeanConvertUtil;
+import com.java110.utils.util.StringUtil;
 import com.java110.vo.api.ApiRoomDataVo;
 import com.java110.vo.api.ApiRoomVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,11 +148,12 @@ public class QueryRoomsListener extends AbstractServiceApiDataFlowListener {
         if (row > MAX_ROW) {
             throw new SMOException(ResponseConstant.RESULT_CODE_ERROR, "row 数量不能大于50");
         }
-        //校验小区楼ID和小区是否有对应关系
-        int total = floorInnerServiceSMOImpl.queryFloorsCount(BeanConvertUtil.covertBean(reqJson, FloorDto.class));
-
-        if (total < 1) {
-            throw new IllegalArgumentException("传入小区楼ID不是该小区的楼");
+        // 仅在指定楼栋筛选时校验归属，未指定楼栋时允许查询空小区。
+        if (!StringUtil.isEmpty(reqJson.getString("floorId"))) {
+            int total = floorInnerServiceSMOImpl.queryFloorsCount(BeanConvertUtil.covertBean(reqJson, FloorDto.class));
+            if (total < 1) {
+                throw new IllegalArgumentException("传入小区楼ID不是该小区的楼");
+            }
         }
 
     }

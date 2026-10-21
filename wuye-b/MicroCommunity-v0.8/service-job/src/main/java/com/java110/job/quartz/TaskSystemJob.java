@@ -2,6 +2,7 @@ package com.java110.job.quartz;
 
 import com.java110.dto.task.TaskDto;
 import com.java110.utils.factory.ApplicationContextFactory;
+import com.java110.utils.config.DisabledFeatures;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -30,7 +31,13 @@ public class TaskSystemJob implements Job {
         try {
             TaskDto taskDto = (TaskDto) (context.getJobDetail().getJobDataMap()
                     .get(JOB_DATA_TASK));
-            taskSystemQuartz = (TaskSystemQuartz) ApplicationContextFactory.getBean(taskDto.getTaskTemplateDto().getClassBean());
+            String taskBean = taskDto.getTaskTemplateDto().getClassBean();
+            if (DisabledFeatures.isDisabledTask(taskBean)
+                    || Boolean.getBoolean("java110.local.disableScheduledTasks")) {
+                logger.debug("跳过停用任务：{}", taskBean);
+                return;
+            }
+            taskSystemQuartz = (TaskSystemQuartz) ApplicationContextFactory.getBean(taskBean);
             taskSystemQuartz.startTask(taskDto);
         } catch (Throwable ex) {
             logger.error("执行任务失败：", ex);

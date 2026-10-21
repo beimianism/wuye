@@ -24,18 +24,6 @@
 						<text class="text-grey">个人信息</text>
 					</view>
 				</view>
-				<view class="cu-item arrow" @tap="_repairFinish()">
-					<view class="content">
-						<text class="lg text-gray cuIcon-order"></text>
-						<text class="text-grey">维修已办</text>
-					</view>
-				</view>
-				<view class="cu-item arrow" @tap="_complaintFinish()">
-					<view class="content">
-						<text class="lg text-gray cuIcon-favor"></text>
-						<text class="text-grey">投诉已办</text>
-					</view>
-				</view>
 				<view class="cu-item arrow" @tap="_changePwd()">
 					<view class="content">
 						<text class="lg text-gray cuIcon-lock"></text>
@@ -91,7 +79,7 @@
 		data() {
 			return {
 				staffInfo: {
-					img: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big99008.jpg',
+					img: '/static/logo.png',
 					name: '一纸荒年',
 				},
 				currentCommunityName:'',
@@ -125,18 +113,6 @@
 					url:"/pages/userInfo/userInfo"
 				});
 			},
-			_repairFinish:function(){
-				uni.navigateTo({
-					url:"/pages/repairDispatchFinish/repairDispatchFinish"
-				})
-			},
-			//投诉已办
-			_complaintFinish:function(){
-				this.context.navigateTo({
-					url:'/pages/complaintFinish/complaintFinish'
-				})
-			},
-			//修改密码
 			_changePwd:function(){
 				uni.navigateTo({
 					url:"/pages/changePwd/changePwd"

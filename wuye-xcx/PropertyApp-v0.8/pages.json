@@ -1,24 +1,24 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "HC掌上物业"
 			}
-		}
-	    ,{
+		},
+		{
             "path" : "pages/addressList/addressList",
             "style" : {
 				"navigationBarTitleText": "通讯录"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/my/my",
             "style" : {
 				"navigationBarTitleText": "我的"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/login/login",
             "style" : {
 				// "navigationBarTitleText": "请登录"
@@ -30,234 +30,76 @@
 				"navigationStyle": "custom"
 				
 			}
-        }
-        ,{
-            "path" : "pages/activityes/activityes",
-            "style" : {
-				"navigationBarTitleText": "小区文化"
-			}
-        }
-        ,{
-            "path" : "pages/activityDetail/activityDetail",
-            "style" : {
-				"navigationBarTitleText": "文化详情"
-			}
-        }
-        ,{
-            "path" : "pages/notice/notice",
-            "style" : {
-            	"navigationBarTitleText": "公告"
-            }
-        }
-        ,{
+        },
+		{
             "path" : "pages/changeCommunity/changeCommunity",
             "style" : {
 				"navigationBarTitleText": "切换小区"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/userInfo/userInfo",
             "style" : {
 				"navigationBarTitleText": "个人信息"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/changePwd/changePwd",
             "style" : {
 				"navigationBarTitleText": "修改密码"
 			}
-        }
-        ,{
-            "path" : "pages/notice/detail/noticeDetail",
-            "style" : {
-				"navigationBarTitleText": "通知页面详情"
-				}
-        }
-        ,{
-            "path" : "pages/complaintList/complaintList",
-            "style" : {
-				"navigationBarTitleText": "投诉受理单"
-			}
-        }
-        ,{
-            "path" : "pages/auditComplaintOrder/auditComplaintOrder",
-            "style" : {
-				"navigationBarTitleText": "处理投诉单"
-			}
-        }
-        ,{
-            "path" : "pages/complaintOrderDetail/complaintOrderDetail",
-            "style" : {
-				"navigationBarTitleText": "投诉单详情"
-			}
-        }
-        ,{
-            "path" : "pages/complaintOrder/complaintOrder",
-            "style" : {
-				"navigationBarTitleText": "投诉录单"
-			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/floorList/floorList",
             "style" : {
 				"navigationBarTitleText": "选择楼栋"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/unitList/unitList",
             "style" : {
 				"navigationBarTitleText": "选择单元"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/roomList/roomList",
             "style" : {
 				"navigationBarTitleText": "选择房屋"
 			}
         },
 		{
-		    "path" : "pages/repairOrder/repairOrder",
-		    "style" : {
-				"navigationBarTitleText": "维修工单池"
-			}
-		},
-		{
-		    "path" : "pages/repairDispatch/repairDispatch",
-		    "style" : {
-				"navigationBarTitleText": "维修待办单"
-			}
-		},
-		{
-		    "path" : "pages/repairDetail/repairDetail",
-		    "style" : {
-				"navigationBarTitleText": "维修详情"
-			}
-		}
-		,{
-		    "path" : "pages/repairAdd/repairAdd",
-		    "style" : {
-				"navigationBarTitleText": "添加记录"
-			}
-		}
-        ,{
-            "path" : "pages/inspection/inspection",
-            "style" : {
-				"navigationBarTitleText": "巡检打卡"
-				
-			}
-        }
-        ,{
-            "path" : "pages/purchase/purchase",
-            "style" : {
-				"navigationBarTitleText": "采购管理",
-				"navigationBarBackgroundColor":"#57fef6"
-			}
-        }
-        ,{
-            "path" : "pages/excuteInspection/excuteInspection",
-            "style" : {
-				"navigationBarTitleText": "巡检过程"
-			}
-        }
-        ,{
-            "path" : "pages/excuteOneInspection/excuteOneInspection",
-            "style" : {
-				"navigationBarTitleText": "执行巡检"
-			}
-        },{
-            "path" : "pages/purchaseRequest/purchaseRequest",
-            "style" : {
-				"navigationBarTitleText": "采购申请"
-			}
-        }
-        ,{
-            "path" : "pages/pOutOfStorageRequest/pOutOfStorageRequest",
-            "style" : {
-				"navigationBarTitleText": "出库申请"
-			}
-        }
-        ,{
-            "path" : "pages/purchasingSchedule/purchasingSchedule",
-            "style" : {
-				"navigationBarTitleText": "申请进度"
-			}
-        }
-        ,{
-            "path" : "pages/purchaseReview/purchaseReview",
-            "style" : {
-				"navigationBarTitleText": "采购审核"
-			}
-        }
-        ,{
-            "path" : "pages/purchaseList/purchaseList",
-            "style" : {
-				"navigationBarTitleText": "选择类型"
-			}
-        }
-        ,{
-            "path" : "pages/repairHandle/repairHandle",
-            "style" : {
-				"navigationBarTitleText": "订单处理"
-			}
-        }
-        ,{
-            "path" : "pages/repairDispatchFinish/repairDispatchFinish",
-            "style" : {
-				"navigationBarTitleText": "维修已办"
-				
-			}
-        }
-        ,{
-            "path" : "pages/appraiseRepair/appraiseRepair",
-            "style" : {
-				"navigationBarTitleText": "回访工单"
-			}
-        }
-        ,{
-            "path" : "pages/complaintFinish/complaintFinish",
-            "style" : {
-				"navigationBarTitleText": "投诉已办单"
-			}
-        }
-        ,{
-            "path" : "pages/complaintHandle/complaintHandle",
-            "style" : {
-				"navigationBarTitleText": "投诉处理"	
-			}
-        }
-        ,{
             "path" : "pages/roomDetail/roomDetail",
             "style" : {
 				"navigationBarTitleText": "房产信息"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/selectFloor/selectFloor",
             "style" : {
 				"navigationBarTitleText": "选择楼栋"
 				
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/selectUnit/selectUnit",
             "style" : {
 				"navigationBarTitleText": "选择单元"
 				
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/selectRoom/selectRoom",
             "style" : {
 				"navigationBarTitleText": "选择房屋"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/feeDetail/feeDetail",
             "style" : {
 				"navigationBarTitleText": "费用详情"
 			}
-        }
-        ,{
+        },
+		{
             "path" : "pages/roomPayFee/roomPayFee",
             "style" : {
 				"navigationBarTitleText": "收银台"
@@ -316,22 +158,16 @@
 		    "style" : {
 				"navigationBarTitleText": "跟踪记录详情"
 			}
-		}
-        ,{
+		},
+		{
             "path" : "pages/payFeeByQrCode/payFeeByQrCode",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "请扫二维码支付",
                 "enablePullDownRefresh": false
             }
-        },
-		{
-		    "path" : "pages/resourceStoreManage/resourceStoreManage",
-		    "style" : {
-				"navigationBarTitleText": "我的物品"
-			}
-		}
-    ],
+        }
+	],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "HC掌上物业",

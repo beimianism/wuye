@@ -19,46 +19,6 @@
 					</swiper-item>
 				</block>
 			</swiper>
-			<!-- 轮播图 -->
-			<view class="margin-top-xs">
-				<swiper class="screen-swiper swiper-height-index" :indicator-dots="true" :circular="true"
-				 :autoplay="true" interval="5000" duration="500">
-					<swiper-item v-for="(item,index) in swiperList" :key="index">
-						<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-						<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
-					</swiper-item>
-				</swiper>
-			</view>
-
-			<view class="cu-bar bg-white solid-bottom margin-top">
-				<view class="action">
-					<view class="bock-icon "></view>
-					<text class="margin-left-xs">小区文化</text>
-				</view>
-				<view class="action" @tap="_moreActivity()">
-					<text class="lg text-gray cuIcon-more"></text>
-				</view>
-			</view>
-			<view class="noticesList">
-				<block v-for="(item,index) in activitys" :key="index" wx:key="index">
-
-					<view class="noticesList-list" @tap="_toDetail(item)">
-						<view class="notices-info">
-							<view class="notices-info-name">{{item.title}}</view>
-
-							<view class="notice-bottom">
-								<view>
-									<text class="lg text-gray cuIcon-time"></text>
-									<text class="notice-startTime">{{item.startTime}}</text>
-								</view>
-							</view>
-						</view>
-						<view class="notices-info-image">
-							<image :src="item.src" />
-						</view>
-					</view>
-				</block>
-			</view>
 		</scroll-view>
 		<view class="flex justify-center tec-height align-center">
 			<text class="text-gray">java110团队提供技术支持,交流群827669685</text>
@@ -70,9 +30,6 @@
 	// 后期开启 远程开门 和抄表
 	import uniNoticeBar from '@/components/uni-notice-bar/uni-notice-bar.vue'
 	import {
-		loadAdvert,
-		loadCategory,
-		loadActivitys,
 		loadCategoryMenus,
 		listStaffPrivileges
 	} from '../../api/index/index.js'
@@ -83,8 +40,7 @@
 				currentCommunityId: '',
 				currentCommunityName: '',
 				categoryList: [],
-				swiperList: [],
-				activitys: []
+
 			}
 		},
 		components: {
@@ -127,65 +83,6 @@
 						_that._loadCurrentCommunity(_communitys);
 					})
 			},
-			_loadAd: function() {
-				let _that = this;
-				let _objData = {
-					page: 1,
-					row: 5,
-					locationTypeCd: '4000'
-				};
-				loadAdvert(this, _objData)
-					.then(function(res) {
-						if (res.statusCode == 200) {
-							let _advertPhotos = res.data;
-							_that.swiperList = _advertPhotos;
-							_that._loadActivitys();
-							return;
-						}
-						wx.showToast({
-							title: "服务器异常了",
-							icon: 'none',
-							duration: 2000
-						})
-					})
-			},
-			_loadActivitys: function() {
-				let _that = this;
-				let _objData = {
-					page: 1,
-					row: 5,
-					communityId: this.currentCommunityId
-				};
-				loadActivitys(this, _objData)
-					.then(function(res) {
-						if (res.statusCode == 200) {
-							let _activites = res.data.activitiess;
-							let _acts = [];
-							_activites.forEach(function(_item) {
-								_item.src = _that.java110Constant.url.filePath + "?fileId=" + _item.headerImg + "&communityId=" + _that.currentCommunityId +
-									"&time=" + new Date();
-								_acts.push(_item);
-							});
-							_that.activitys = _acts;
-							return;
-						}
-						wx.showToast({
-							title: "服务器异常了",
-							icon: 'none',
-							duration: 2000
-						})
-					})
-			},
-			_moreActivity: function() {
-				this.context.navigateTo({
-					url: '/pages/activityes/activityes?currentCommunityId=' + this.currentCommunityId
-				});
-			},
-			_toDetail: function(_item) {
-				this.context.navigateTo({
-					url: '/pages/activityDetail/activityDetail?activitiesId=' + _item.activitiesId + "&currentCommunityId=" + this.currentCommunityId
-				});
-			},
 			_toHref: function(_item) {
 				this.context.navigateTo({
 					url: _item.href
@@ -200,7 +97,7 @@
 					uni.setStorageSync(_that.java110Constant.mapping.CURRENT_COMMUNITY_INFO, JSON.stringify(_tmpCommunityInfo));
 					_that.currentCommunityId = _tmpCommunityInfo.communityId;
 					_that.currentCommunityName = _tmpCommunityInfo.name;
-					_that._loadAd();
+
 					return;
 				}
 				let communityId = '';
@@ -214,13 +111,13 @@
 					uni.setStorageSync(_that.java110Constant.mapping.CURRENT_COMMUNITY_INFO, JSON.stringify(_tmpCommunityInfo));
 					_that.currentCommunityId = _tmpCommunityInfo.communityId;
 					_that.currentCommunityName = _tmpCommunityInfo.name;
-					_that._loadAd();
+
 					return;
 				}
 
 				_that.currentCommunityId = currentCommunity.communityId;
 				_that.currentCommunityName = currentCommunity.name;
-				_that._loadAd();
+
 			}
 
 		}

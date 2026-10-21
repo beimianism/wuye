@@ -13,11 +13,11 @@
 const baseUrl = '/'; 
 // #endif
 
-const commonBaseUrl= 'https://app.demo.winqi.cn';
+const commonBaseUrl= 'http://127.0.0.1:8012/';
 
 // #ifndef H5
 //服务器域名 小程序 或者 app 时 后端地址
-const baseUrl = 'https://app.demo.winqi.cn/'; 
+const baseUrl = 'http://127.0.0.1:8012/';
 // #endif
 
 

@@ -21,7 +21,7 @@
         mounted: function () {
             this._initSysInfo();
             this.getNavCommunity(1, 3);
-            this.getNavData();
+
             //this.getUserInfo();
         },
         methods: {
@@ -153,7 +153,6 @@
                             //对首页做特殊处理，因为首页在加载数据时还没有小区信息 会报错
                             if (vm.nav.communityInfos != null && vm.nav.communityInfos.length > 0) {
                                 vc.emit("indexContext", "_queryIndexContextData", {});
-                                vc.emit("indexArrears", "_listArrearsData", {});
                             }
 
                         }
@@ -207,6 +206,9 @@
     });
 
     vm.getUserInfo();
+
+    // Keep the archived browser notice channel inactive in the local edition.
+    if (!window.localFeatures || !window.localFeatures.browserMessagesEnabled) return;
 
     //建立websocket 消息连接
     let _userId = vc.getData('/nav/getUserInfo').userId;

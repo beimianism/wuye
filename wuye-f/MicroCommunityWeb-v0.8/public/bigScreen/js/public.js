@@ -40,7 +40,7 @@
         }
         _todayInpection.innerHTML = _li;
     }
-    _loadAssetInspection();
+
     /********************************今日巡检  end****************************************** */
 
     /********************************小区资产 start****************************************** */
@@ -65,7 +65,7 @@
                     document.getElementById("floorCount").innerHTML = _data.floorCount;
                     document.getElementById("roomCount").innerHTML = _data.roomCount;
                     document.getElementById("parkingSpaceCount").innerHTML = _data.parkingSpaceCount;
-                    document.getElementById("machineCount").innerHTML = _data.machineCount;
+
 
                     return;
                 }
@@ -206,7 +206,7 @@
 
             });
     }
-    _getAssetOpenDoor();
+
     /********************************开门次数 end****************************************** */
 
 
@@ -394,7 +394,6 @@
 
     }
 
-    _loadAssetsRepair();
     /********************************报修分析 end*************************************** */
 
     /********************************费用分析 start*************************************** */

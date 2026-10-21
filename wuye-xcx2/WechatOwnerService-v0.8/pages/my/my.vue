@@ -52,24 +52,6 @@
 					<text class="text-grey">缴费历史</text>
 				</view>
 			</view>
-			<view class="cu-item arrow" @click="myComplaint()">
-				<view class="content">
-					<text class="cuIcon-form text-green"></text>
-					<text class="text-grey">我的投诉单</text>
-				</view>
-			</view>
-			<view class="cu-item arrow" @click="myRepair()">
-				<view class="content">
-					<text class="cuIcon-formfill text-orange"></text>
-					<text class="text-grey">我的报修单</text>
-				</view>
-			</view>
-			<view class="cu-item arrow" @click="_machineTranslate()">
-				<view class="content">
-					<text class="cuIcon-formfill text-orange"></text>
-					<text class="text-grey">门禁同步日志</text>
-				</view>
-			</view>
 			<view class="cu-item arrow" @click="myRenovation()">
 				<view class="content">
 					<text class="cuIcon-form text-green"></text>
@@ -208,19 +190,6 @@
 				});
 			},
 
-			myComplaint: function() {
-				if (!this.ckeckUserInfo()) {
-					this.vc.navigateTo({
-						url: '../showlogin/showlogin'
-					}, () => {
-						this.refreshPageLoginInfo();
-					});
-					return;
-				}
-				this.vc.navigateTo({
-					url: '../complaintList/complaintList'
-				});
-			},
 			onGotUserInfo: function(e) {
 				console.log("nickname=" + JSON.stringify(e.detail.userInfo));
 			},
@@ -248,19 +217,6 @@
 				}
 				this.vc.navigateTo({
 					url: '../my/myHouse'
-				});
-			},
-			myRepair: function() {
-				if (!this.ckeckUserInfo()) {
-					this.vc.navigateTo({
-						url: '../showlogin/showlogin'
-					}, () => {
-						this.refreshPageLoginInfo();
-					});
-					return;
-				}
-				this.vc.navigateTo({
-					url: '/pages/myRepair/myRepair',
 				});
 			},
 			mySettings: function() {
@@ -313,11 +269,6 @@
 			myParking: function() {
 				this.vc.navigateTo({
 					url: '/pages/parkingInfo/parkingInfo',
-				});
-			},
-			_machineTranslate: function() {
-				this.vc.navigateTo({
-					url: '/pages/machineTranslateLog/machineTranslateLog',
 				});
 			},
 			mallOrder:function(){

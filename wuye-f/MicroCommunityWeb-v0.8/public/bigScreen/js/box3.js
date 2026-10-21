@@ -90,7 +90,7 @@ function _loadAssets() {
                 document.getElementById("floorCount").innerHTML = _data.floorCount + "栋";
                 document.getElementById("roomCount").innerHTML = _data.roomCount + "个";
                 document.getElementById("parkingSpaceCount").innerHTML = _data.parkingSpaceCount + "个";
-                document.getElementById("machineCount").innerHTML = _data.machineCount + "台";
+
 
                 return;
             }
@@ -138,5 +138,3 @@ function _getAssetOpenDoor() {
 
 
 _loadAssets();
-
-_getAssetOpenDoor();

@@ -1,3 +1,4 @@
+const localFeatures = require('../config/local-features.js');
 /**
  * 上下文对象,再其他文件调用常量 方法 时间工具类时 只引入上下文文件
  * 
@@ -31,6 +32,7 @@ const getHeaders = function() {
 
 
 const request = function(_reqObj) {
+	if (localFeatures.blockRequest(_reqObj)) return;
 	//检查是否登录成功
 	factory.login.checkLoginStatus(function() {
 		//重写token

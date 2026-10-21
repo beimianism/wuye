@@ -1,0 +1,51 @@
+[
+  {
+    "database": "TT",
+    "table": "s_store",
+    "column": "state",
+    "definition": "varchar(12) NOT NULL DEFAULT '48001' COMMENT '正常商户；48002限制登录'",
+    "reason": "0.8 StoreServiceDaoImplMapper.getStoreUserInfo reads state; 0.6 dump omits it. UserLoginServiceListener treats 48002 as disabled."
+  },
+  {
+    "database": "TT",
+    "table": "s_community",
+    "column": "tel",
+    "definition": "varchar(30) DEFAULT NULL",
+    "reason": "0.8 CommunityServiceDaoImplMapper reads/writes contact tel; absent from both 0.6 shards."
+  },
+  {
+    "database": "TT",
+    "table": "business_community",
+    "column": "tel",
+    "definition": "varchar(30) DEFAULT NULL",
+    "reason": "0.8 CommunityServiceDaoImplMapper reads/writes contact tel; absent from both 0.6 shards."
+  },
+  {
+    "database": "hc_community",
+    "table": "s_community",
+    "column": "tel",
+    "definition": "varchar(30) DEFAULT NULL",
+    "reason": "0.8 CommunityServiceDaoImplMapper reads/writes contact tel; absent from both 0.6 shards."
+  },
+  {
+    "database": "hc_community",
+    "table": "business_community",
+    "column": "tel",
+    "definition": "varchar(30) DEFAULT NULL",
+    "reason": "0.8 CommunityServiceDaoImplMapper reads/writes contact tel; absent from both 0.6 shards."
+  },
+  {
+    "database": "TT",
+    "table": "building_room",
+    "column": "room_type",
+    "definition": "varchar(12) NOT NULL DEFAULT '1010301'",
+    "reason": "0.8 RoomDto default ordinary room=1010301; room mapper now filters this discriminator, absent in 0.6 dump."
+  },
+  {
+    "database": "TT",
+    "table": "business_building_room",
+    "column": "room_type",
+    "definition": "varchar(12) NOT NULL DEFAULT '1010301'",
+    "reason": "0.8 RoomDto default ordinary room=1010301; room mapper now filters this discriminator, absent in 0.6 dump."
+  }
+]

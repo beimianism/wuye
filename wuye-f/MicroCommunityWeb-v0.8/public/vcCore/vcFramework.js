@@ -119,6 +119,10 @@
      */
     vcFramework.builderVcTree = async function () {
         let _componentUrl = location.hash;
+        if (window.localFeatures.isDisabled(_componentUrl)) {
+            _componentUrl = '#/pages/property/indexContext';
+            window.history.replaceState(null, '', location.pathname + _componentUrl);
+        }
 
         //判断是否为组件页面
         if (vcFramework.notNull(_componentUrl)) {
@@ -188,6 +192,10 @@
      */
     vcFramework.reBuilderVcTree = async function () {
         let _componentUrl = location.hash;
+        if (window.localFeatures.isDisabled(_componentUrl)) {
+            _componentUrl = '#/pages/property/indexContext';
+            window.history.replaceState(null, '', location.pathname + _componentUrl);
+        }
 
         //判断是否为组件页面
         if (!vcFramework.notNull(_componentUrl)) {
@@ -1273,11 +1281,12 @@
 
     //保存用户菜单
     vcFramework.setMenus = function (_menus) {
-        window.localStorage.setItem('hc_menus', JSON.stringify(_menus));
+        window.localStorage.setItem('hc_menus', JSON.stringify(window.localFeatures.filterMenus(_menus)));
     };
     //获取用户菜单
     vcFramework.getMenus = function () {
-        return JSON.parse(window.localStorage.getItem('hc_menus'));
+        var menus = JSON.parse(window.localStorage.getItem('hc_menus'));
+        return menus === null ? null : window.localFeatures.filterMenus(menus);
     };
 
     //保存菜单状态

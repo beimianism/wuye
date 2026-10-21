@@ -1,3 +1,5 @@
+import localFeatures from './config/local-features.js'
+localFeatures.install(uni)
 import Vue from 'vue';
 import App from './App';
 

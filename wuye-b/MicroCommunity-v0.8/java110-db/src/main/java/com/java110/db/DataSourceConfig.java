@@ -3,8 +3,9 @@ package com.java110.db;
 import org.apache.shardingsphere.shardingjdbc.api.yaml.YamlShardingDataSourceFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.Filter;
 import javax.sql.DataSource;
@@ -25,7 +26,8 @@ public class DataSourceConfig {
     //@Autowired
     private Filter statFilter;
 
-    private static final String SHARDING_YML_PATH = "dataSource.yml";
+    @Value("${java110.datasource.config:classpath:dataSource.yml}")
+    private String dataSourceLocation;
 
     /**
      * 构建dataSource
@@ -64,7 +66,7 @@ public class DataSourceConfig {
         InputStream inputStream = null;
         ByteArrayOutputStream swapStream = null;
         try {
-            Resource resource = new ClassPathResource(SHARDING_YML_PATH);
+            Resource resource = new DefaultResourceLoader().getResource(dataSourceLocation);
 
             inputStream = resource.getInputStream();
             swapStream = new ByteArrayOutputStream();

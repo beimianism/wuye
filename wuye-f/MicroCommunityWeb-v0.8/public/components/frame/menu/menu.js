@@ -56,7 +56,7 @@
                     'getMenus',
                     param,
                     function (json, res) {
-                        var _menus = JSON.parse(json);
+                        var _menus = window.localFeatures.filterMenus(JSON.parse(json));
                         if (_menus == null || _menus.length == 0) {
                             return;
                         }

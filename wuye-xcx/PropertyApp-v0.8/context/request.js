@@ -1,3 +1,4 @@
+import localFeatures from '../config/local-features.js';
 import login from '../factory/login.js'
 
 
@@ -7,6 +8,7 @@ export default{
 	 * @param {Object} _reqObj 请求内容
 	 */
 	request:function(_reqObj) {
+		if (localFeatures.blockRequest(_reqObj)) return;
 		//检查是否登录成功
 		login.checkLoginStatus(function() {
 			//重写token

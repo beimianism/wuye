@@ -76,18 +76,18 @@
             "disableHostCheck" : true,
             "proxy" : {
                 "/app" : {
-                    "target" : "https://app.demo.winqi.cn", //目标接口域名
+                    "target" : "http://127.0.0.1:8012", //目标接口域名
                     "changeOrigin" : true, //是否跨域
                     "secure" : true // 设置支持https协议的代理
                 },
                 "/callComponent" : {
-                    "target" : "https://app.demo.winqi.cn", //目标接口域名
+                    "target" : "http://127.0.0.1:8012", //目标接口域名
                     "changeOrigin" : true, //是否跨域
                     "secure" : true // 设置支持https协议的代理
                 }
             }
         },
-        "domain" : "owner.demo.winqi.cn",
+        "domain" : "http://127.0.0.1",
         "publicPath" : "./",
         "title" : "HC智慧家园"
     }

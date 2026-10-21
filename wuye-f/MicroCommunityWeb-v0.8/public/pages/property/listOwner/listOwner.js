@@ -94,8 +94,8 @@
 
                         vc.component.listOwnerInfo.total = listOwnerData.total;
                         vc.component.listOwnerInfo.records = listOwnerData.records;
-                        vc.component.listOwnerInfo.owners = listOwnerData.owners;
-                        $that.dealOwnerAttr(listOwnerData.owners);
+                        vc.component.listOwnerInfo.owners = Array.isArray(listOwnerData.owners) ? listOwnerData.owners : [];
+                        $that.dealOwnerAttr(vc.component.listOwnerInfo.owners);
                         vc.emit('pagination', 'init', {
                             total: vc.component.listOwnerInfo.records,
                             dataCount: vc.component.listOwnerInfo.total,
@@ -238,6 +238,7 @@
                 }
             },
             dealOwnerAttr: function (owners) {
+                if (!Array.isArray(owners)) return;
                 owners.forEach(item => {
                     $that._getColumnsValue(item);
                 });
@@ -245,7 +246,7 @@
             _getColumnsValue: function (_owner) {
                 _owner.listValues = [];
 
-                if (!_owner.hasOwnProperty('ownerAttrDtos') || _owner.ownerAttrDtos.length < 1) {
+                if (!Array.isArray(_owner.ownerAttrDtos) || _owner.ownerAttrDtos.length < 1) {
                     $that.listOwnerInfo.listColumns.forEach(_value => {
                         _owner.listValues.push('');
                     })
@@ -272,7 +273,7 @@
                 $that.listOwnerInfo.listColumns = [];
                 vc.getAttrSpec('building_owner_attr', function (data) {
                     $that.listOwnerInfo.listColumns = [];
-                    data.forEach(item => {
+                    (Array.isArray(data) ? data : []).forEach(item => {
                         if (item.listShow == 'Y') {
                             $that.listOwnerInfo.listColumns.push(item.specName);
                         }

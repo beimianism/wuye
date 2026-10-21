@@ -173,9 +173,7 @@
     window._toDeadlinePayment = function () {
         vc.jumpToPage('/admin.html#/pages/property/reportDeadlineFee');
     }
-    
 
-    _loadAssetInspection();
 
     _loadPrePaymentCount();
 })()

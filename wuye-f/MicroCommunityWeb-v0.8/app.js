@@ -31,25 +31,19 @@ let opts = {
 }
 
 
-//app.use('/callComponent',proxy('https://app.demo.winqi.cn/',opts));
-//app.use('/callComponent',proxy('http://api.demo.winqi.cn:8012',opts));
-//app.use('/callComponent',proxy('http://api.demo.winqi.cn:8012',opts));
-
-
- //app.use('/callComponent',proxy('http://api.demo.winqi.cn:8012',opts));
- //app.use('/app',proxy('http://api.demo.winqi.cn:8012',opts));
-
-app.use('/callComponent',proxy('http://proxy.homecommunity.cn:9011',opts));
-app.use('/app',proxy('http://proxy.homecommunity.cn:9011',opts));
-
-// app.use('/callComponent',proxy('http://192.168.1.106:8012',opts));
-// app.use('/app',proxy('http://192.168.1.106:8012',opts));
-
-//app.use('/callComponent',proxy('http://192.168.1.16:8012',opts));
-//app.use('/app',proxy('http://192.168.1.16:8012',opts));
-
-//app.use('/callComponent',proxy('http://127.0.0.1:8012',opts));
-//app.use('/app',proxy('http://127.0.1.1:8012',opts));
+// Default to the local Java API. Set BACKEND_URL explicitly for another environment.
+const backendTarget = process.env.BACKEND_URL || 'http://127.0.0.1:8012';
+app.set('backendTarget', backendTarget);
+const localFeatures = require('./public/js/local-features');
+// Enforce before proxy and static middleware; hiding menu entries alone is insufficient.
+app.use(function (req, res, next) {
+  if (localFeatures.isDisabled(req.originalUrl)) {
+    return res.status(404).json({ code: 'FEATURE_DISABLED', message: 'This module is disabled in the local edition.' });
+  }
+  next();
+});
+app.use('/callComponent', proxy(backendTarget, opts));
+app.use('/app', proxy(backendTarget, opts));
 
 //app.listen(3000);
 app.use(express.json());

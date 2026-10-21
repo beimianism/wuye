@@ -1,3 +1,4 @@
+const localFeatures = require('../config/local-features.js');
 /**
  * 重新封装 http 请求
  * add by wuxw 2020-01-01
@@ -8,6 +9,7 @@ class HttpFactory {
   constructor() {}
 
   getSync(_httpHead, _url, _data) {
+    if (localFeatures.isDisabledApi(_url)) return Promise.reject({code:'FEATURE_DISABLED'});
     return new Promise((resolve, reject) => {
       wx.request({
         url: _url,
@@ -28,6 +30,7 @@ class HttpFactory {
   }
 
   postSync(_httpHead, _url, _data) {
+    if (localFeatures.isDisabledApi(_url)) return Promise.reject({code:'FEATURE_DISABLED'});
     return new Promise((resolve, reject) => {
       wx.request({
         url: _url,

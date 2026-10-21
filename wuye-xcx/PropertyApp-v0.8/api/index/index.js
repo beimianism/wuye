@@ -1,3 +1,4 @@
+import localFeatures from '../../config/local-features.js';
 /**
  * 查询 广告信息
  * @param {Object} _that 上下文对象
@@ -64,7 +65,7 @@ export function loadCategoryMenus(_that, _data) {
 					return;
 				}
 
-				let _menus = _data[0].childs;
+				let _menus = localFeatures.filterMenus(_data[0].childs);
 				_menus = _menus.sort(function(a, b) {
 					return a.seq - b.seq;
 				});
@@ -82,7 +83,7 @@ export function loadCategoryMenus(_that, _data) {
 						src: _curMenu.description,
 						href: _curMenu.href
 					});
-					if ((_menuIndex + 1) % 8 == 0 && _menuIndex != 0) {
+					if (_menuPage.length === 8) {
 						_tempMenuData[_menuIndex] = _menuPage;
 						_menuPage = [];
 					}
