@@ -2,6 +2,8 @@
 
 此说明对应 `feat/wechat-test-integration`。使用公众号测试号、现有业主 H5、本地服务及独立数据库；不配置小程序或真实支付。
 
+后台手动通知接口为 POST `/app/fee.pushBill`，仅注册管理端内部应用 `8000418004`，参数为 communityId、oweId、requestId。沿用员工登录身份并校验物业与小区关系；模板和收件人从可信内部服务获取。锁、部分受理进度和不确定结果保存在 Redis，未完成进度不设过期；成功通知不改变支付状态。运行 `python scripts/local.py migrate` 注册接口，再刷新订单服务 APP_ROUTE_SERVICE 缓存。用 `python scripts/tests/run_bill_notify_java.py` 运行22项不发送真实消息的 JUnit（先定向打包 service-api）。
+
 ## 配置与数据库
 
 管理后台新增或修改公众号时，类型为 `1100`，填写名称、微信 AppID、AppSecret、小区。`mchId` 与 `payPassword` 可以同时留空；只填一个会被拒绝。小程序类型 `1000` 仍须填写完整支付配置。更新以数据库中的类型为准，不能通过提交另一个类型绕过验证。

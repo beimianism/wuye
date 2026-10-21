@@ -2,6 +2,8 @@
 
 沿用 `wuye-xcx2/WechatOwnerService-v0.8` 的 Vue 2 / uni-app 页面，不需要 HBuilderX 或微信开发者工具。未重新注册已裁剪页面。CLI、Vue、Sass 等版本记录在 package.json / package-lock.json。
 
+手动账单通知链接使用 `roomFeeListNew?roomId=...`。该页现在优先选择指定的自有房屋；无匹配房屋则停止费用查询并提示，无参数时沿用首套房屋。6项定位用例及 H5 构建通过，多房屋手机实测待验收。
+
 以下 PowerShell 命令均从仓库根目录执行：
 
 ```powershell

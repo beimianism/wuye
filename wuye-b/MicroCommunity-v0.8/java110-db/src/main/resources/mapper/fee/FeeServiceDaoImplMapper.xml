@@ -587,6 +587,12 @@
     <update id="updateBillOweFees" parameterType="Map">
         update bill_owe_fee t set t.state = #{state} where t.fee_id = #{feeId} and t.community_id=#{communityId}
         and t.bill_id=#{billId}
+        <if test="oweId != null and oweId != ''">
+            and t.owe_id=#{oweId}
+        </if>
+        <if test='state == "3000"'>
+            and t.state in ('1000','3000')
+        </if>
     </update>
 
     <insert id="insertBill" parameterType="Map">

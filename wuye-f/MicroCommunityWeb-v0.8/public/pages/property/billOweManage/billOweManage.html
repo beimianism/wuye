@@ -22,8 +22,8 @@
                             <select class="custom-select" v-model="billOweManageInfo.conditions.state">
                                 <option selected value="">请选择交费状态</option>
                                 <option value="1000">未催缴</option>
-                                <!-- <option value="2000">已缴费</option> -->
-                                <option value="2000">已催缴</option>
+                                <option value="3000">已催缴</option>
+                                <option value="2000">已缴费</option>
                             </select>
                         </div>
                         <div class="col-sm-3">
@@ -78,6 +78,7 @@
                                 <th class="text-center">业主姓名</th>
                                 <th class="text-center">联系电话</th>
                                 <th class="text-center">状态</th>
+                                <th class="text-center">操作</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -94,13 +95,18 @@
                                     <span class="badge badge-success" v-else-if="billOwe.state == '3000'">已催缴</span>
                                     <span class="badge badge-danger" v-else>未催缴</span>
                                 </td>
-
-
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                        v-if="_canPushBill(billOwe)" :disabled="_isPushingBill(billOwe)"
+                                        v-on:click="_pushBill(billOwe)">
+                                        {{_isPushingBill(billOwe) ? '推送中...' : (billOwe.state == '3000' ? '再次推送' : '推送账单')}}
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="7">
+                                <td colspan="10">
                                     <ul class="pagination float-right"></ul>
                                 </td>
                             </tr>

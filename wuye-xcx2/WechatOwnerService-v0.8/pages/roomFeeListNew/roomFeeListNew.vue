@@ -62,6 +62,7 @@
 			return {
 				rooms: [],
 				curRoom: {},
+				requestedRoomId: '',
 				moreRooms: [],
 				needFefresh: true,
 				noData: false
@@ -75,6 +76,7 @@
 		 * 生命周期函数--监听页面加载
 		 */
 		onLoad: function(options) {
+			this.requestedRoomId = options.roomId || '';
 			context.onLoad(options);
 		},
 		/**
@@ -92,15 +94,21 @@
 				this.rooms = _rooms;
 				let _owner = data.owner;
 				_that.moreRooms = [];
-				if (_rooms.length == 0) {
-					_that.noData = true;
-					return;
-				}
 				_rooms.forEach(function(_room) {
 					_room.communityId = _owner.communityId;
 					_room.communityName = _owner.communityName;
 				});
-				_that.curRoom = _rooms[0];
+				let _selectedRoom = _that.requestedRoomId
+					? _rooms.find(_room => _room.roomId == _that.requestedRoomId) : _rooms[0];
+				if (!_selectedRoom) {
+					_that.curRoom = {};
+					_that.noData = true;
+					if (_that.requestedRoomId) {
+						uni.showToast({ icon: 'none', title: '通知中的房屋不存在或未绑定，请核实房屋信息' });
+					}
+					return;
+				}
+				_that.curRoom = _selectedRoom;
 				_that._loadRoomFee();
 			});
 		},
@@ -136,6 +144,7 @@
 				});
 			},
 			switchRoom: function(_room) {
+				this.requestedRoomId = _room.roomId;
 				this.curRoom = _room;
 				this.noData = false;
 				this._loadRoomFee();

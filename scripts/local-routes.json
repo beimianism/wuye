@@ -1,5 +1,14 @@
 [
   {
+    "id": "local_20261021_003",
+    "code": "fee.pushBill",
+    "url": "",
+    "method": "POST",
+    "apps": ["8000418004"],
+    "instance": "N",
+    "reason": "Manual selected-bill notification listener, available only through the authenticated property admin app."
+  },
+  {
     "id": "local_20261021_001",
     "code": "/communitys/queryStoreCommunitys",
     "url": "http://community-service",
