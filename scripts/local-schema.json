@@ -53,5 +53,9 @@
   {"database":"TT","table":"business_owner_app_user","column":"nickname","definition":"varchar(200) DEFAULT NULL","reason":"0.8 OwnerAppUser business insert and instance copy require nickname."},
   {"database":"TT","table":"business_owner_app_user","column":"headimgurl","definition":"varchar(1000) DEFAULT NULL","reason":"0.8 OwnerAppUser business insert and instance copy require headimgurl."},
   {"database":"TT","table":"pay_fee_config","column":"computing_formula_text","definition":"varchar(1000) DEFAULT NULL","reason":"0.8 Fee mapper selects the formula explanation when listing owner bills."},
-  {"database":"TT","table":"business_pay_fee_config","column":"computing_formula_text","definition":"varchar(1000) DEFAULT NULL","reason":"0.8 FeeConfig mapper inserts and copies computing_formula_text from the business table."}
+  {"database":"TT","table":"business_pay_fee_config","column":"computing_formula_text","definition":"varchar(1000) DEFAULT NULL","reason":"0.8 FeeConfig mapper inserts and copies computing_formula_text from the business table."},
+  {"database":"TT","table":"building_owner_room_rel","column":"start_time","definition":"datetime DEFAULT NULL","reason":"0.8 OwnerRoomRel mapper reads relation dates during bill generation; absent from 0.6 dump."},
+  {"database":"TT","table":"building_owner_room_rel","column":"end_time","definition":"datetime DEFAULT NULL","reason":"0.8 OwnerRoomRel mapper reads relation dates during bill generation; absent from 0.6 dump."},
+  {"database":"TT","table":"business_building_owner_room_rel","column":"start_time","definition":"datetime DEFAULT NULL","reason":"0.8 OwnerRoomRel business/instance copy requires matching relation dates."},
+  {"database":"TT","table":"business_building_owner_room_rel","column":"end_time","definition":"datetime DEFAULT NULL","reason":"0.8 OwnerRoomRel business/instance copy requires matching relation dates."}
 ]

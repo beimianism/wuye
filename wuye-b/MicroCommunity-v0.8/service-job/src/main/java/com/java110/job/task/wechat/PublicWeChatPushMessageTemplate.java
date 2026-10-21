@@ -1,6 +1,7 @@
 package com.java110.job.task.wechat;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.java110.core.factory.WechatFactory;
 import com.java110.dto.community.CommunityDto;
 import com.java110.dto.fee.BillDto;
@@ -99,7 +100,7 @@ public class PublicWeChatPushMessageTemplate extends TaskSystemQuartz {
         smallWeChatDto.setObjId(communityDto.getCommunityId());
         List<SmallWeChatDto> smallWeChatDtos = smallWeChatInnerServiceSMOImpl.querySmallWeChats(smallWeChatDto);
 
-        if (smallWeChatDto == null || smallWeChatDtos.size() <= 0) {
+        if (smallWeChatDtos == null || smallWeChatDtos.size() <= 0) {
             logger.info("未配置微信公众号信息,定时任务执行结束");
             return;
         }
@@ -132,21 +133,25 @@ public class PublicWeChatPushMessageTemplate extends TaskSystemQuartz {
         ownerAppUserDto.setAppType(OwnerAppUserDto.APP_TYPE_WECHAT);
         List<OwnerAppUserDto> ownerAppUserDtos = ownerAppUserInnerServiceSMOImpl.queryOwnerAppUsers(ownerAppUserDto);
 
-        if (ownerAppUserDtos.size() <= 0 || ownerAppUserDtos == null) {
+        if (ownerAppUserDtos == null || ownerAppUserDtos.size() <= 0) {
             logger.info("未查询到业主与微信公众号绑定关系");
             return;
         }
 
-        List<String> memberIdList = new ArrayList<>(ownerAppUserDtos.size());
+        List<String> ownerIdList = new ArrayList<>(ownerAppUserDtos.size());
         for (OwnerAppUserDto appUserDto : ownerAppUserDtos) {
-            memberIdList.add(appUserDto.getMemberId());
+            if (!StringUtil.isEmpty(appUserDto.getOwnerId())) {
+                ownerIdList.add(appUserDto.getOwnerId());
+            }
         }
-
-        String[] memberIds = memberIdList.toArray(new String[memberIdList.size()]);
+        if (ownerIdList.isEmpty()) {
+            return;
+        }
+        String[] ownerIds = ownerIdList.toArray(new String[ownerIdList.size()]);
         //查询欠费信息
         BillOweFeeDto billOweFeeDto = new BillOweFeeDto();
         billOweFeeDto.setCommunityId(weChatDto.getObjId());
-        billOweFeeDto.setOwnerIds(memberIds);
+        billOweFeeDto.setOwnerIds(ownerIds);
         billOweFeeDto.setState("1000");
         billOweFeeDto.setCurBill("T");
         List<BillOweFeeDto> billOweFeeDtos = feeInnerServiceSMOImpl.queryBillOweFees(billOweFeeDto);
@@ -172,9 +177,15 @@ public class PublicWeChatPushMessageTemplate extends TaskSystemQuartz {
 
         String oweUrl = "";
         for (BillOweFeeDto fee : billOweFeeDtos) {
+            boolean sent = false;
+            boolean failed = false;
             oweUrl = FeeDto.PAYER_OBJ_TYPE_ROOM.equals(fee.getPayerObjType()) ? oweRoomUrl : oweCarUrl;
             for (OwnerAppUserDto appUserDto : ownerAppUserDtos) {
-                if (fee.getOwnerId().equals(appUserDto.getMemberId())) {
+                if (fee.getOwnerId().equals(appUserDto.getOwnerId())) {
+                    if (StringUtil.isEmpty(appUserDto.getOpenId())) {
+                        failed = true;
+                        continue;
+                    }
                     Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(fee.getFeeEndTime());
                     Calendar now = Calendar.getInstance();
                     now.setTime(date);
@@ -199,12 +210,23 @@ public class PublicWeChatPushMessageTemplate extends TaskSystemQuartz {
                         }
                     }
                     templateMessage.setData(data);
-                    logger.info("发送模板消息内容:{}", JSON.toJSONString(templateMessage));
                     ResponseEntity<String> responseEntity = outRestTemplate.postForEntity(url, JSON.toJSONString(templateMessage), String.class);
-                    logger.info("微信模板返回内容:{}", responseEntity);
+                    JSONObject result = JSONObject.parseObject(responseEntity.getBody());
+                    if (!responseEntity.getStatusCode().is2xxSuccessful() || result == null
+                            || !Integer.valueOf(0).equals(result.getInteger("errcode"))
+                            || StringUtil.isEmpty(result.getString("msgid"))) {
+                        failed = true;
+                        logger.warn("微信账单模板发送失败，错误码:{}", result == null ? null : result.getInteger("errcode"));
+                        continue;
+                    }
+                    sent = true;
+                    logger.info("微信账单模板已受理，消息ID:{}", result.getString("msgid"));
                 }
             }
 
+            if (!sent || failed) {
+                continue;
+            }
             BillOweFeeDto tmpBillOweFeeDto = new BillOweFeeDto();
             tmpBillOweFeeDto.setFeeId(fee.getFeeId());
             tmpBillOweFeeDto.setCommunityId(fee.getCommunityId());
