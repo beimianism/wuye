@@ -6,7 +6,7 @@
 
 **Tech Stack:** Vue 2 / uni-app H5、Node、Java 8、Python、微信测试号、临时 HTTPS 隧道。
 
-**2026-10-21 执行记录：** 已完成代码、构建和本地真实业务查询，测试号凭据已通过微信 token 接口验证。旧隧道 URL/Token 曾提交成功，切换新入口后消息回调校验仍失败；用户手机微信授权、测试账号登录及房屋/0.01 元账单查询通过，后台确认 WECHAT OpenID 绑定。后续按用户要求，限定单个测试业主通过原出账和推送业务发送一次真实通知，微信 API 受理且后台更新状态，手机收件/点击和新域名授权待确认；未进行支付。详细结果见 `docs/WECHAT-TEST.md`、`docs/OWNER-H5.md`、`docs/WECHAT-BACKEND.md` 和 `docs/PROJECT-STATUS.md`。
+**2026-10-21 执行记录：** 已完成代码、构建和本地真实业务查询，测试号凭据已通过微信 token 接口验证。旧隧道 URL/Token 曾提交成功，切换新入口后消息回调校验仍失败；用户手机微信授权、测试账号登录及房屋/0.01 元账单查询通过，后台确认 WECHAT OpenID 绑定。后续按用户要求，限定单个测试业主通过原出账和推送业务发送一次真实通知，微信 API 受理且后台更新状态，用户已确认新网页授权域名保存、手机收到通知且点击可查看测试费用；未进行支付。详细结果见 `docs/WECHAT-TEST.md`、`docs/OWNER-H5.md`、`docs/WECHAT-BACKEND.md` 和 `docs/PROJECT-STATUS.md`。
 
 ## Task 1: 恢复环境并记录事实
 
@@ -45,4 +45,4 @@
 
 - [ ] WeChat test platform callback submission and OAuth domain save.
 - [ ] Phone WeChat authorization, owner identity binding and bill query.
-- [x] 用户指定的测试模板及唯一测试业主：原业务出账 0.01 元，限定范围发送一次，微信 errcode=0/msgid，后台状态 1000→3000；手机收件与点击待确认。未开启全小区任务。
+- [x] 用户指定的测试模板及唯一测试业主：原业务出账 0.01 元，限定范围发送一次，微信 errcode=0/msgid，后台状态 1000→3000；用户已确认手机收到、点击后能查看测试费用。未开启全小区任务。
