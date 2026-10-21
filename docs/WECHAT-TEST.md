@@ -17,7 +17,7 @@ python scripts/wechat_test.py status
 
 H5 工具链安装和首次构建见 [OWNER-H5.md](OWNER-H5.md)。管理后台地址为 `http://127.0.0.1:3000`；受限业主入口为 `http://127.0.0.1:8080`；H5 静态服务绑定本机 `8000`。自定义 `ownerH5Port` 后需重启 H5 和受限入口。
 
-`tunnel` 使用 Windows OpenSSH 将本机受限入口转发到临时 HTTPS 域名，地址写回本地配置，并更新独立数据库的 `OWNER_WECHAT_URL` 和欠费页面链接。隧道重启可能换域名，必须重新设置微信平台。当前环境 Cloudflare 的连接测试未通过，采用 SSH 临时入口；域名和隧道可用性以实际网络测试为准。
+`tunnel` 使用 Windows OpenSSH 将本机受限入口转发到临时 HTTPS 域名，地址写回本地配置，并更新独立数据库的 `OWNER_WECHAT_URL` 和欠费页面链接。匿名隧道可能在运行中或重启后更换域名；本次已观察到运行中换域名，旧域名返回 502。遇到此情况重新执行 `tunnel`，打开新生成的填写说明，并重新设置微信平台 URL 和授权域名。当前环境 Cloudflare 的连接测试未通过，采用 SSH 临时入口；这不是长期固定的测试环境。
 
 ```powershell
 # 只停止业主入口及对应 SSH 隧道，保留本地管理后台
@@ -34,11 +34,11 @@ python scripts/wechat_test.py handoff
 
 1. 登录 [微信公众平台接口测试号](https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login)。AppID/AppSecret 已填写时不用重复操作。新机器先执行 `python scripts/wechat_test.py init`；重新填写可以运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/wechat-test-setup.ps1`，密钥输入框为隐藏输入。
 2. 后台公众号记录保存成功，并将其属性 `33001` 改为本地 Token 后，生成 `.runtime/wechat-test-handoff.html`。此页只含填写所需回调地址、Token、域名、入口及访问码，不含 AppSecret。
-3. 打开该本地说明页，将 URL 和 Token 填入测试号平台的「接口配置信息」，点击提交；在「网页授权获取用户基本信息」中设置授权回调域名，只填主机名。
+3. 打开该本地说明页，将短 URL `https://<临时域名>/wechat-test/callback` 和 Token 填入测试号平台的「接口配置信息」，点击提交；在「网页授权获取用户基本信息」中设置授权回调域名，只填主机名。「JS接口安全域名」是另一项设置，保存它不代表网页授权域名已保存。
 4. 手机微信扫码关注测试号，在微信内打开临时 HTTPS 地址，输入测试访问码，进入业主页面。实际 OAuth 必须在微信内由用户完成授权。
 5. 绑定业主后检查「我的房屋」、物业费及账单详情。新数据库没有真实业主、房屋和费用时，需要先录入业务数据或使用明确标识的本机联调数据。
 
-公众号内部应用 ID 为 `992020061452450002`，与微信 `wx...` AppID 不同。服务器验证 URL 的 `wId` 来自后台公众号记录，作为查询值 URL 编码。详细后端协议见 [WECHAT-BACKEND.md](WECHAT-BACKEND.md)。
+公众号内部应用 ID 为 `992020061452450002`，与微信 `wx...` AppID 不同。短回调的 GET 校验由入口检查 Token 签名后直接返回原始 echostr；POST 消息转发至配置中的后台回调，使用可信的内部应用 ID 和编码后的 `wId`，由后台再次验签。详细后端协议见 [WECHAT-BACKEND.md](WECHAT-BACKEND.md)。
 
 ## 开放范围与当前边界
 

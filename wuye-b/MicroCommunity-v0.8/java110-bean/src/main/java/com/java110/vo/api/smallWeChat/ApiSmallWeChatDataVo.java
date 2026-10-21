@@ -21,6 +21,15 @@ public class ApiSmallWeChatDataVo implements Serializable {
     private String mchId;
     private String objTypeName;
     private String wId;
+    private String weChatType;
+
+    public String getWeChatType() {
+        return weChatType;
+    }
+
+    public void setWeChatType(String weChatType) {
+        this.weChatType = weChatType;
+    }
 
     public String getOperate() {
         return operate;

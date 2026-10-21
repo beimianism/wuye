@@ -21,7 +21,13 @@ java110.auth.wechat.wechatAppSecret=<测试号AppSecret>
 
 ## 公网路径与微信平台设置
 
-服务器校验 URL：
+微信平台填写短回调 URL：
+
+```text
+https://<临时域名>/wechat-test/callback
+```
+
+入口对 GET 使用本地 Token 校验 SHA1 签名并直接返回明文 echostr，减少后台调用延迟；POST 转发至本地配置中的原后台路径，内部应用 ID 和 wId 不允许由外部查询参数覆盖。原后台路径为：
 
 ```text
 https://<临时域名>/app/wechat/gateway?java110AppId=992020061452450002&wId=<URL编码后的wId>
@@ -43,7 +49,7 @@ uni-app 使用 `#/pages/...` 路由，所以 `code`/`authTicket` 加入 fragment
 ## 已执行的局部验证
 
 - Java 8 手动编译修改的 API、front、utils 类成功。
-- JUnit：`SmallWeChatConfigurationTest`、`OwnerWechatOAuthTest`、`WechatPayUnavailableTest`、`SmallWeChatMapperTest` 共 17 项通过，覆盖无支付/部分/完整配置、类型伪造、空字符串更新 SQL、state、回放、fragment 路由、微信错误、上游异常、已绑定业主票据登录及单次消费。
+- JUnit：`SmallWeChatConfigurationTest`、`OwnerWechatOAuthTest`、`WechatPayUnavailableTest`、`SmallWeChatMapperTest`、`SmallWeChatListContractTest` 共 20 项通过，覆盖无支付/部分/完整配置、类型伪造、空字符串更新 SQL、state、回放、fragment 路由、微信错误、上游异常、已绑定业主票据登录及单次消费、列表响应类型保留及 Web 凭据清除。
 - Web：`node --test wuye-f/MicroCommunityWeb-v0.8/tests/wechat-config.test.cjs`，8 项通过，包含管理页传入数字类型的情况。
 
 Java 局部验证使用 `.tools/zulu8.96.0.205-ca-jdk8.0.504-win_x64`、`.runtime/query-rooms-test/lib`，排除冲突的 `log4j-slf4j-impl`，并使用 Maven 缓存中的 JUnit 4.13.1/hamcrest。测试的 Redis、内部业务 HTTP 和微信 HTTP 都是内存替身，不请求真实微信，不生成订单或发布菜单。完整打包、运行数据库保存/更新和公网验证需由集成步骤另行记录。

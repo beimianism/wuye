@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const http = require('node:http');
+const crypto = require('node:crypto');
 const { createGateway } = require('../wechat-test-gateway.cjs');
 
 test('test ingress restricts routes and sessions, hides credentials, and preserves OAuth callbacks', async t => {
@@ -13,12 +14,21 @@ test('test ingress restricts routes and sessions, hides credentials, and preserv
   await new Promise(r => upstream.listen(0, '127.0.0.1', r));
   t.after(() => upstream.close());
   const config = { appId: 'wxtest123456789012', appSecret: 'SECRET-DO-NOT-EXPOSE', communityId: 'community',
-    token: 'PRIVATE_CALLBACK_TOKEN', accessCode: 'test-access-code-123', sessionSecret: 'a'.repeat(64), publicBaseUrl: '' };
+    token: 'PRIVATE_CALLBACK_TOKEN', accessCode: 'test-access-code-123', sessionSecret: 'a'.repeat(64), publicBaseUrl: '',
+    callbackPath: '/app/wechat/gateway?java110AppId=992020061452450002&wId=abc%2Bdef' };
   const target = 'http://127.0.0.1:' + upstream.address().port;
   const gateway = createGateway({ config: () => config, backend: target, owner: target });
   await new Promise(r => gateway.listen(0, '127.0.0.1', r));
   t.after(() => gateway.close());
   const base = 'http://127.0.0.1:' + gateway.address().port;
+  const query = new URLSearchParams({ timestamp: '123456', nonce: 'wx-test-nonce', echostr: '1234567890' });
+  query.set('signature', crypto.createHash('sha1').update([config.token, query.get('timestamp'), query.get('nonce')].sort().join('')).digest('hex'));
+  const callback = await fetch(base + '/wechat-test/callback?' + query);
+  assert.equal(callback.status, 200);
+  assert.equal(await callback.text(), '1234567890');
+  assert.equal(received.length, 0, 'Server verification must not wait for backend business calls');
+  query.set('signature', 'invalid-signature');
+  assert.equal((await fetch(base + '/wechat-test/callback?' + query)).status, 403);
   const invalidTargetStatus = await new Promise((resolve, reject) => {
     const request = http.get(base, { path: '//[' }, response => {
       response.resume(); resolve(response.statusCode);
@@ -53,6 +63,11 @@ test('test ingress restricts routes and sessions, hides credentials, and preserv
   assert.equal((await fetch(base + '/app/fee.listFee', { method: 'POST', headers })).status, 405);
   assert.equal((await fetch(base + '/app/loginOwnerWechatAuth?state=expected&code=test')).status, 200);
   assert.equal((await fetch(base + '/app/wechat/gateway?signature=test&echostr=123')).status, 200);
+  assert.equal((await fetch(base + '/wechat-test/callback?signature=test&timestamp=123&nonce=wx&wId=attacker', { method: 'POST', body: '<xml/>' })).status, 200);
+  const forwardedCallback = new URL(received.at(-1).url, base);
+  assert.equal(forwardedCallback.pathname, '/app/wechat/gateway');
+  assert.equal(forwardedCallback.searchParams.get('wId'), 'abc+def');
+  assert.equal(forwardedCallback.searchParams.get('signature'), 'test');
   assert.equal((await fetch(base + '/wechat-test/config.js', { headers: { cookie: cookie + 'tampered' } })).status, 403);
   const foreignHostStatus = await new Promise((resolve, reject) => {
     const request = http.get(base + '/', { headers: { host: 'attacker.example', cookie } }, response => {

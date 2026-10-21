@@ -64,6 +64,29 @@ function createGateway(options) {
     let url;
     try { url = new URL(req.url, 'http://localhost'); }
     catch { return json(res, 404, { msg: '路径不可用' }); }
+    if (url.pathname === '/wechat-test/callback') {
+      if (req.method === 'GET') {
+        const signature = url.searchParams.get('signature') || '';
+        const timestamp = url.searchParams.get('timestamp') || '';
+        const nonce = url.searchParams.get('nonce') || '';
+        const echo = url.searchParams.get('echostr');
+        if (!config.token || !timestamp || !nonce || echo === null || echo.length > 1024
+          || !/^[a-f0-9]{40}$/.test(signature)) return json(res, 403, { msg: '微信校验参数无效' });
+        const expected = crypto.createHash('sha1').update([config.token, timestamp, nonce].sort().join('')).digest('hex');
+        if (!equal(signature, expected)) return json(res, 403, { msg: '微信签名校验失败' });
+        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+        return res.end(echo);
+      }
+      if (req.method !== 'POST') return json(res, 405, { msg: '请求方法不可用' });
+      let callback;
+      try { callback = new URL(config.callbackPath, 'http://localhost'); }
+      catch { return json(res, 503, { msg: '后台回调尚未配置' }); }
+      if (callback.pathname !== '/app/wechat/gateway') return json(res, 503, { msg: '后台回调尚未配置' });
+      for (const [key, value] of url.searchParams) {
+        if (key !== 'wId' && key !== 'java110AppId') callback.searchParams.set(key, value);
+      }
+      url = callback;
+    }
     if (url.pathname === '/wechat-test/enter') {
       if (req.method !== 'POST') return json(res, 405, { msg: '请通过测试入口提交访问码' });
       let body = '';
@@ -121,7 +144,7 @@ function createGateway(options) {
       headers['x-forwarded-proto'] = new URL(origin).protocol.slice(0, -1);
     }
     const proxy = http.request({ hostname: target.hostname, port: target.port, method: req.method,
-      path: req.url, headers, timeout: 25000 }, upstream => {
+      path: url.pathname + url.search, headers, timeout: 25000 }, upstream => {
       res.writeHead(upstream.statusCode, { ...upstream.headers, 'cache-control': 'no-store', 'referrer-policy': 'no-referrer' });
       upstream.pipe(res);
     });

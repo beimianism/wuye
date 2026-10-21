@@ -6,7 +6,7 @@
 
 **Tech Stack:** Vue 2 / uni-app H5、Node、Java 8、Python、微信测试号、临时 HTTPS 隧道。
 
-**2026-10-21 执行记录：** 已完成代码、构建和本地真实业务查询，测试号凭据已通过微信 token 接口验证。尚待用户在测试号平台提交 URL/Token、设置授权域名并在手机微信内授权；没有进行真实通知或支付。详细结果见 `docs/WECHAT-TEST.md`、`docs/OWNER-H5.md`、`docs/WECHAT-BACKEND.md` 和 `docs/PROJECT-STATUS.md`。
+**2026-10-21 执行记录：** 已完成代码、构建和本地真实业务查询，测试号凭据已通过微信 token 接口验证。用户已确认短回调 URL/Token 在测试号平台提交成功，仍待确认独立网页授权域名设置及手机微信授权；没有进行真实通知或支付。详细结果见 `docs/WECHAT-TEST.md`、`docs/OWNER-H5.md`、`docs/WECHAT-BACKEND.md` 和 `docs/PROJECT-STATUS.md`。
 
 ## Task 1: 恢复环境并记录事实
 

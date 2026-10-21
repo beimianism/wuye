@@ -38,9 +38,14 @@ def public_origin(value):
     return 'https://' + parsed.netloc
 
 
+def tunnel_origin(log):
+    announcements = re.findall(r'tunneled with tls termination,\s*(https://[a-zA-Z0-9-]+\.(?:lhr\.life|localhost\.run))', log)
+    return announcements[-1] if announcements else None
+
+
 def handoff_html(config, fixture=None):
     origin = public_origin(config['publicBaseUrl'])
-    callback = origin + config.get('callbackPath', '/app/wechat/gateway')
+    callback = origin + '/wechat-test/callback'
     values = [('接口配置信息 → URL', callback), ('接口配置信息 → Token', config['token']),
               ('网页授权获取用户基本信息 → 授权回调页面域名', urlsplit(origin).netloc),
               ('手机微信内打开', origin + '/'), ('测试访问码', config['accessCode'])]
@@ -52,7 +57,7 @@ def handoff_html(config, fixture=None):
     return ('<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             '<title>公众号测试号接入配置</title><style>body{font:16px sans-serif;max-width:900px;margin:40px auto;padding:20px;color:#1e293b}'
             'pre{padding:16px;background:#f1f5f9;white-space:pre-wrap;overflow-wrap:anywhere;user-select:all}label{font-weight:bold}</style>'
-            '<h1>公众号测试号接入配置</h1><p>在微信测试号平台填写前两项并点击提交，再设置网页授权域名（仅域名，无 https:// 或路径）。</p>'
+            '<h1>公众号测试号接入配置</h1><p>在微信测试号平台填写前两项并点击提交，再设置网页授权域名（仅域名，无 https:// 或路径）。JS接口安全域名与网页授权域名是不同设置，保存前者不代表后者已保存。</p>'
             + rows + '<p>用手机微信扫码关注该测试号后，在微信内打开测试地址并输入访问码。公众号菜单暂未发布，支付暂未开通。</p>'
             '<p>此页只保存在本机，请勿上传到 GitHub。临时隧道重启后域名可能变化，需要重新填写。</p></html>')
 
@@ -134,9 +139,9 @@ def tunnel():
     deadline = time.monotonic() + 45
     while time.monotonic() < deadline:
         text = SSH_LOG.read_text(encoding='utf-8', errors='replace')
-        matches = re.findall(r'https://[a-zA-Z0-9-]+\.(?:lhr\.life|localhost\.run)', text)
-        if matches:
-            set_public(matches[-1])
+        origin = tunnel_origin(text)
+        if origin:
+            set_public(origin)
             return
         if process.poll() is not None:
             raise RuntimeError('SSH tunnel exited; see .runtime/logs/wechat-ssh-tunnel.log')
