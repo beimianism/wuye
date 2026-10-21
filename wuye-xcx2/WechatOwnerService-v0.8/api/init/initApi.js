@@ -23,9 +23,11 @@ export function getWAppId(){
 		//1.0 获取当前页面
 		let routes = getCurrentPages();
 		//在微信小程序或是app中，通过curPage.options；如果是H5，则需要curPage.$route.query（H5中的curPage.options为undefined，所以刚好就不需要条件编译了）
-		let curParam = routes[routes.length - 1].options;
+		let current = routes[routes.length - 1];
+		let curParam = current && (current.options || current.$route && current.$route.query) || {};
 		//2.0 从当前页面参数中获取
 		wAppId = curParam.wAppId;
+		if (isNull(wAppId)) wAppId = conf.wAppId;
 	 // #endif
 	
 	//3.0 微信小程序直接调用小程序获取
@@ -59,10 +61,13 @@ export function getWAppId(){
  * 页面加载方法
  * @param {Object} _option 页面参数对象
  */
-export function onLoad(_option, callback = () => {}){
+export function onLoad(_option = {}, callback = () => {}){
+	getWAppId();
 	// #ifdef H5
 	let _key = _option.key;
-	if (isNotNull(_key)) {
+	if (isNotNull(_option.authTicket)) {
+		doLoginOwnerByKey({authTicket:_option.authTicket}, callback);
+	} else if (isNotNull(_key)) {
 		//根据key 去做登录
 		doLoginOwnerByKey(_key, callback);
 	}

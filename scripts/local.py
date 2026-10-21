@@ -92,6 +92,18 @@ def properties(path, values):
 def configure():
     cfg = settings()
     (RUN / 'config').mkdir(parents=True, exist_ok=True)
+    # The bundled XML sets child API/Druid loggers to DEBUG, overriding parent
+    # package levels and recording request bodies/SQL parameters with secrets.
+    logback = RUN / 'config/logback-local.xml'
+    logback.write_text('''<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder><pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{60} - %msg%n</pattern></encoder>
+  </appender>
+  <logger name="com.java110" level="INFO"/>
+  <root level="WARN"><appender-ref ref="CONSOLE"/></root>
+</configuration>
+''', encoding='utf-8')
     for name, port in SERVICES.items():
         values = {
             'server.address': '127.0.0.1', 'server.port': port,
@@ -110,7 +122,9 @@ def configure():
             'java110.code.zookeeper.url': '127.0.0.1', 'java110.code.zookeeper.port': 12181,
             'server.tomcat.max-threads': 30, 'server.tomcat.min-spare-threads': 2,
             'logging.file': str(RUN / f'logs/{name}-spring.log'),
+            'logging.config': logback.as_uri(),
             'logging.level.root': 'WARN', 'logging.level.com.java110': 'INFO',
+            'logging.level.org.springframework.web.client': 'INFO',
             'spring.datasource.url': jdbc('TT'), 'spring.datasource.username': 'wuye_local',
             'spring.datasource.password': cfg['db_password'],
         }
@@ -254,6 +268,7 @@ def start(names):
         config = RUN / f'config/{name}.properties'
         env['SPRING_APPLICATION_JSON'] = json.dumps(dict(line.split('=', 1) for line in config.read_text(encoding='utf-8').splitlines() if line))
         spawn(name, [java(), '-Xms48m', '-Xmx256m', '-XX:ParallelGCThreads=2',
+                     '-Dlogback.configurationFile=' + str(RUN / 'config/logback-local.xml'),
                      '-Djava110.local.disableScheduledTasks=' + ('false' if os.environ.get('WUYE_ENABLE_SCHEDULED_TASKS') == '1' else 'true'), '-Dfile.encoding=UTF-8',
                      '-jar', str(jar), '--spring.profiles.active=dev',
                      '--spring.config.additional-location=' + config.as_uri()], SERVICES[name], env=env)

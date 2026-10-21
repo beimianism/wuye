@@ -197,7 +197,6 @@
 						duration: 2000
 					})
 				} else {
-					console.log("提交数据", obj);
 					uni.showLoading({
 						title: '加载中',
 						mask: true
@@ -208,7 +207,6 @@
 						method: "POST",
 						data: obj, //动态数据
 						success: function(res) {
-							console.log(res);
 							let _data = res.data;
 							//成功情况下跳转
 							wx.hideLoading();

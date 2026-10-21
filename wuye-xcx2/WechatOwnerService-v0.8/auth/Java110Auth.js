@@ -1,11 +1,12 @@
 import mapping from '../constant/MappingConstant.js'
+import ownerSession from './owner-session.js';
 
 /**
  * 检查会话是否 存在
  * add by 吴学文 QQ:928255095
  */
 export function checkSession() {
-	return new Promise((resolve, reject) => {
+	return ownerSession.ready().then(() => new Promise((resolve, reject) => {
 		let _that = this;
 		let loginFlag = wx.getStorageSync(mapping.LOGIN_FLAG);
 		let nowDate = new Date();
@@ -49,7 +50,7 @@ export function checkSession() {
 			reject();
 		}
 		// #endif
-	});
+	}));
 }
 /**
  * 是否登录 不跳转 只是判断是否登录

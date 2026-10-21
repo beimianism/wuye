@@ -91,6 +91,10 @@ public class WechatPayAdapt implements IPayAdapt {
                                               String feeName, String tradeType,
                                               String orderNum, double money,
                                               String openId, SmallWeChatDto smallWeChatDto, String notifyUrl) throws Exception {
+        if (smallWeChatDto == null || StringUtil.isEmpty(smallWeChatDto.getMchId())
+                || StringUtil.isEmpty(smallWeChatDto.getPayPassword())) {
+            throw new IllegalArgumentException("微信支付未开通：请先配置商户ID与支付密码");
+        }
         logger.info("【小程序支付】 统一下单开始, 订单编号=" + orderNum);
         SortedMap<String, String> resultMap = new TreeMap<String, String>();
         //生成支付金额，开发环境处理支付金额数到0.01、0.02、0.03元

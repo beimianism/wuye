@@ -33,7 +33,7 @@
 	export default {
 		data() {
 			return {
-				rooms: ""
+				rooms: []
 			};
 		},
 
@@ -45,7 +45,6 @@
 		 */
 		onLoad: function(options) {
 			context.onLoad(options);
-			console.log('123123')
 			this.loadOwnerHouse();
 		},
 

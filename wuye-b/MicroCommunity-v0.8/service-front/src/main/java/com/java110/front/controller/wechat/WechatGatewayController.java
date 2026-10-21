@@ -78,14 +78,11 @@ public class WechatGatewayController extends BaseController {
         String echostr = request.getParameter("echostr");
         String wId = request.getParameter(WechatConstant.PAGE_WECHAT_APP_ID);
         String java110AppId = request.getParameter("java110AppId");
-        logger.debug("请求参数" + JSONObject.toJSONString(request.getParameterMap()));
         if (!StringUtil.isEmpty(wId)) {
             wId = wId.replace(" ", "+");
             token = getToken(java110AppId, wId);
         }
         String responseStr = "";
-        logger.debug("token = " + token + "||||" + "signature = " + signature + "|||" + "timestamp = "
-                + timestamp + "|||" + "nonce = " + nonce + "|||" + "echostr = " + echostr);
         String sourceString = "";
         String[] ss = new String[]{token, timestamp, nonce};
         Arrays.sort(ss);
@@ -93,7 +90,6 @@ public class WechatGatewayController extends BaseController {
             sourceString += s;
         }
         String signature1 = AuthenticationFactory.SHA1Encode(sourceString).toLowerCase();
-        logger.debug("sourceString = " + sourceString + "||||" + "signature1 = " + signature1);
         try {
             if (signature1.equals(signature)) {
                 responseStr = echostr;
@@ -126,14 +122,11 @@ public class WechatGatewayController extends BaseController {
         String java110AppId = request.getParameter("java110AppId");
         String responseStr = "";
         String wId = request.getParameter(WechatConstant.PAGE_WECHAT_APP_ID);
-        logger.debug("请求参数" + request.getParameterMap().toString());
         if (!StringUtil.isEmpty(wId)) {
             wId = wId.replace(" ", "+");
             token = getToken(java110AppId, wId);
         }
         ResponseEntity<String> responseEntity = null;
-        logger.debug("token = " + token + "||||" + "signature = " + signature + "|||" + "timestamp = "
-                + timestamp + "|||" + "nonce = " + nonce + "|||| param = " + param + "|||| openId= " + openId);
         String sourceString = "";
         String[] ss = new String[]{token, timestamp, nonce};
         Arrays.sort(ss);
@@ -141,7 +134,6 @@ public class WechatGatewayController extends BaseController {
             sourceString += s;
         }
         String signature1 = AuthenticationFactory.SHA1Encode(sourceString).toLowerCase();
-        logger.debug("sourceString = " + sourceString + "||||" + "signature1 = " + signature1);
         try {
             if (!signature1.equals(signature)) {
                 responseStr = "亲，非法访问，签名失败";

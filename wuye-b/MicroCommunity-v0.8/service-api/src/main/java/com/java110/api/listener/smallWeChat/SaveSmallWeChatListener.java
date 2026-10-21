@@ -2,6 +2,7 @@ package com.java110.api.listener.smallWeChat;
 
 import com.alibaba.fastjson.JSONObject;
 import com.java110.api.bmo.smallWeChat.ISmallWeChatBMO;
+import com.java110.api.bmo.smallWeChat.SmallWeChatConfiguration;
 import com.java110.api.listener.AbstractServiceApiPlusListener;
 import com.java110.core.annotation.Java110Listener;
 import com.java110.core.context.DataFlowContext;
@@ -32,7 +33,7 @@ public class SaveSmallWeChatListener extends AbstractServiceApiPlusListener {
         Assert.hasKeyAndValue(reqJson, "name", "请求报文中未包含name");
         Assert.hasKeyAndValue(reqJson, "appId", "请求报文中未包含appId");
         Assert.hasKeyAndValue(reqJson, "appSecret", "请求报文中未包含appSecret");
-        Assert.hasKeyAndValue(reqJson, "payPassword", "请求报文中未包含payPassword");
+        SmallWeChatConfiguration.validate(reqJson);
         Assert.hasKeyAndValue(reqJson, "weChatType", "请求报文中未包含weChatType");
         Assert.hasKeyAndValue(reqJson, "objId", "请求报文中未包含objId(小区id)");
         Assert.hasKeyAndValue(reqJson, "weChatType", "请求报文中未包含类型");

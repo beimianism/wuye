@@ -52,8 +52,9 @@ public class CommonCache extends BaseCache {
 
         try {
             redis = getJedis();
-            value = redis.get(key);
-            removeValue(key);
+            // GETSET is atomic: concurrent consumers cannot both receive a login ticket.
+            value = redis.getSet(key, "");
+            redis.del(key);
         } finally {
             if (redis != null) {
                 redis.close();

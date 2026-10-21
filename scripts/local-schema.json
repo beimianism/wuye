@@ -47,5 +47,11 @@
     "column": "room_type",
     "definition": "varchar(12) NOT NULL DEFAULT '1010301'",
     "reason": "0.8 RoomDto default ordinary room=1010301; room mapper now filters this discriminator, absent in 0.6 dump."
-  }
+  },
+  {"database":"TT","table":"owner_app_user","column":"nickname","definition":"varchar(200) DEFAULT NULL","reason":"0.8 OwnerAppUser mapper selects and inserts WeChat nickname; absent from 0.6 dump."},
+  {"database":"TT","table":"owner_app_user","column":"headimgurl","definition":"varchar(1000) DEFAULT NULL","reason":"0.8 OwnerAppUser mapper selects and inserts WeChat avatar URL; absent from 0.6 dump."},
+  {"database":"TT","table":"business_owner_app_user","column":"nickname","definition":"varchar(200) DEFAULT NULL","reason":"0.8 OwnerAppUser business insert and instance copy require nickname."},
+  {"database":"TT","table":"business_owner_app_user","column":"headimgurl","definition":"varchar(1000) DEFAULT NULL","reason":"0.8 OwnerAppUser business insert and instance copy require headimgurl."},
+  {"database":"TT","table":"pay_fee_config","column":"computing_formula_text","definition":"varchar(1000) DEFAULT NULL","reason":"0.8 Fee mapper selects the formula explanation when listing owner bills."},
+  {"database":"TT","table":"business_pay_fee_config","column":"computing_formula_text","definition":"varchar(1000) DEFAULT NULL","reason":"0.8 FeeConfig mapper inserts and copies computing_formula_text from the business table."}
 ]

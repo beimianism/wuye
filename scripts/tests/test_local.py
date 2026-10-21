@@ -20,6 +20,7 @@ class LocalConfigTests(unittest.TestCase):
                 self.assertIn('spring.redis.port=16379', text)
                 self.assertIn('kafka.producer.servers=127.0.0.1:19092', text)
                 self.assertIn('java110.code.zookeeper.port=12181', text)
+                self.assertIn('logging.config=file:', text)
                 self.assertNotIn('dev.java110.com', text)
                 source = local.BACK / f'service-{name}/src/main/resources/dataSource.yml'
                 if source.exists():
@@ -30,6 +31,10 @@ class LocalConfigTests(unittest.TestCase):
                     self.assertIn('127.0.0.1:13306/TT', active)
                     self.assertIn('shardingRule:', active)
                     self.assertIn('java110.datasource.config=file:', text)
+            logback = (Path(directory) / 'config/logback-local.xml').read_text()
+            self.assertNotIn('level="DEBUG"', logback)
+            self.assertNotIn('resource=', logback)
+            self.assertIn('<root level="WARN">', logback)
 
     def test_existing_import_never_reimports_business_data(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(local, 'RUN', Path(directory)), patch.object(local, 'mysql_run') as mysql:

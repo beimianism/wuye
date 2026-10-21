@@ -202,7 +202,7 @@
         <if test="storeId !=null and storeId != ''">
             , t.store_Id= #{storeId}
         </if>
-        <if test="payPassword !=null and payPassword != ''">
+        <if test="payPassword !=null">
             , t.pay_password= #{payPassword}
         </if>
         <if test="remarks !=null and remarks != ''">
@@ -214,7 +214,7 @@
         <if test="objType !=null and objType != ''">
             , t.obj_type= #{objType}
         </if>
-        <if test="mchId !=null and mchId != ''">
+        <if test="mchId !=null">
             , t.mch_id= #{mchId}
         </if>
         where 1=1

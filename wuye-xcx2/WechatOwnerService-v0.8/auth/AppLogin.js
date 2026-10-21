@@ -4,6 +4,7 @@ import {
 } from '../api/java110Request.js'
 import mapping from '../constant/MappingConstant.js'
 import {getWAppId} from '../api/init/initApi.js'
+import ownerSession from './owner-session.js';
 
 /**
  * 
@@ -12,15 +13,15 @@ import {getWAppId} from '../api/init/initApi.js'
  * add by  wuxw QQ 928255095
  */
 export function doLoginOwnerByKey(_key, callback = () => {}) {
+	const complete = ownerSession.begin();
 	requestNoAuth({
 		url: url.loginOwnerByKey,
 		method: 'post',
-		data: {
-			key: _key // 当前页地址
-		},
+		data: typeof _key === 'object' ? {authTicket:_key.authTicket} : {key:_key},
 		success: function(res) {
 			let _param = res.data;
 			if (_param.code != 0) {
+				complete();
 				uni.navigateTo({
 					url: '/pages/showlogin/showlogin?wAppId=' + getWAppId()
 				});
@@ -49,11 +50,18 @@ export function doLoginOwnerByKey(_key, callback = () => {}) {
 				expireTime: afterOneHourDate.getTime()
 			});
 			wx.setStorageSync(mapping.TOKEN, _param.token);
-			//保存临时 钥匙
+			// #ifndef H5
 			wx.setStorageSync(mapping.OWNER_KEY, _param.key);
+			// #endif
+			// #ifdef H5
+			const cleanUrl = window.location.href.replace(/([?&])(?:authTicket|key)=[^&#]*&?/g, '$1').replace(/[?&](?=#|$)/g, '');
+			window.history.replaceState(null, '', cleanUrl);
+			// #endif
+			complete();
 			callback();
 		},
 		fail: function(error) {
+			complete();
 			// 调用服务端登录接口失败
 			uni.navigateTo({
 				url: '/pages/showlogin/showlogin?wAppId=' + getWAppId()

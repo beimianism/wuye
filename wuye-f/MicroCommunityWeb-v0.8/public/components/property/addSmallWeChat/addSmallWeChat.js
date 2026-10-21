@@ -34,15 +34,17 @@
         _initEvent: function () {
             vc.on('addSmallWeChat', 'openAddSmallWeChatModal', function (type) {
                 console.log(type);
-                vc.component.addSmallWeChatInfo.weChatType = type;
+                vc.component.addSmallWeChatInfo.weChatType = String(type);
                 $('#addSmallWeChatModel').modal('show');
             });
         },
         methods: {
             addSmallWeChatValidate() {
-                return vc.validate.validate({
-                    addSmallWeChatInfo: vc.component.addSmallWeChatInfo
-                }, {
+                const info = vc.component.addSmallWeChatInfo;
+                const noPayment = String(info.weChatType) === '1100'
+                    && !String(info.payPassword || '').trim()
+                    && !String(info.mchId || '').trim();
+                const rules = {
                     'addSmallWeChatInfo.name': [
                         {
                             limit: "required",
@@ -100,7 +102,12 @@
                     ],
 
 
-                });
+                };
+                if (noPayment) {
+                    delete rules['addSmallWeChatInfo.payPassword'];
+                    delete rules['addSmallWeChatInfo.mchId'];
+                }
+                return vc.validate.validate({ addSmallWeChatInfo: info }, rules);
             },
             saveSmallWeChatInfo: function () {
                 if (!vc.component.addSmallWeChatValidate()) {

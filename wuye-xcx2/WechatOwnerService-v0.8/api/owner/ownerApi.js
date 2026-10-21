@@ -13,12 +13,13 @@ import
  from '../../constant/url.js'
 
 import mapping from '../../constant/MappingConstant.js'
+import ownerSession from '../../auth/owner-session.js';
 
 /**
  * 查询当前业主信息
  */
 export function getCurOwner() {
-	return new Promise(
+	return ownerSession.ready().then(() => new Promise(
 		(resolve, reject) => {
 			let _ownerInfo = wx.getStorageSync(mapping.OWNER_INFO);
 			if (_ownerInfo) {
@@ -53,7 +54,7 @@ export function getCurOwner() {
 					}
 				});
 			}
-		});
+		}));
 }
 
 

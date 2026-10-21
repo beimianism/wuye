@@ -54,8 +54,8 @@
 		data() {
 			return {
 				logoUrl: '',
-				username: 'test001',
-				password: 'wuxw2015',
+				username: '',
+				password: '',
 				appId: "",
 				code: "",
 				loginByPhone: false,
@@ -69,7 +69,7 @@
 		onLoad(option) {
 			// #ifdef H5
 			this.code = option.code;
-			let _key = option.key;
+			let _key = option.authTicket || option.key;
 			if (_key) {
 				context.onLoad(option);
 				// 判断当前是否已经登录 ，如果登录了跳转至首页
@@ -81,7 +81,7 @@
 			}
 			// #endif
 			_this = this;
-			this.logoUrl = constant.url.baseUrl + 'logo.png';
+			this.logoUrl = '/static/logo.png';
 		},
 		methods: {
 			_doLogin: function() {

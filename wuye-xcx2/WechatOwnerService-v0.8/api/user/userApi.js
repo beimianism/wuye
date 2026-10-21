@@ -112,7 +112,6 @@ export function userLogin(_obj) {
 					uni.hideLoading();
 					//将用户信息携入缓存中
 					uni.hideLoading();
-					console.log("登录返回信息", res);
 					if (res.statusCode != 200) {
 						uni.showToast({
 							icon: 'none',
@@ -145,11 +144,9 @@ export function userLogin(_obj) {
 
 					let s = date.getSeconds(); //获取秒
 
-					console.log("获取过去时间", year, mon, da, h, m, s); //将时间格式转化为时间戳
 
 					let afterOneHourDate = new Date(year, mon, da, h, m, s); //30s之后的时间
 
-					console.log("afterOneHourDate", afterOneHourDate);
 					wx.setStorageSync(constant.mapping.LOGIN_FLAG, {
 						sessionKey: _ownerInfo.userId,
 						expireTime: afterOneHourDate.getTime()

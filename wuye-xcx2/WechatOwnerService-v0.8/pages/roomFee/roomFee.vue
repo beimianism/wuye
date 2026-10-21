@@ -85,10 +85,10 @@
 			</view>
 			<view class="btn-group">
 				<!-- #ifdef H5 || MP-WEIXIN -->
-				<button class="cu-btn bg-red shadow-blur lgplus sharp" @click="onPayFee()">提交订单</button>
+				<button class="cu-btn bg-red shadow-blur lgplus sharp" :disabled="!paymentEnabled" @click="onPayFee()">{{ paymentEnabled ? '提交订单' : '微信支付未开通' }}</button>
 				<!-- #endif -->
 				<!-- #ifdef APP-PLUS -->
-				<button class="cu-btn bg-red shadow-blur lgplus sharp" @click="_payWxApp()">提交订单</button>
+				<button class="cu-btn bg-red shadow-blur lgplus sharp" :disabled="!paymentEnabled" @click="_payWxApp()">{{ paymentEnabled ? '提交订单' : '微信支付未开通' }}</button>
 				<!-- #endif -->
 			</view>
 

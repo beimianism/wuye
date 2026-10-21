@@ -3,6 +3,7 @@ package com.java110.api.bmo.smallWeChat.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.java110.api.bmo.ApiBaseBMO;
 import com.java110.api.bmo.smallWeChat.ISmallWeChatBMO;
+import com.java110.api.bmo.smallWeChat.SmallWeChatConfiguration;
 import com.java110.core.context.DataFlowContext;
 import com.java110.intf.store.ISmallWeChatInnerServiceSMO;
 import com.java110.dto.smallWeChat.SmallWeChatDto;
@@ -32,6 +33,7 @@ public class SmallWeChatBMOImpl extends ApiBaseBMO implements ISmallWeChatBMO {
 
         JSONObject businessSmallWeChat = new JSONObject();
         businessSmallWeChat.putAll(paramInJson);
+        SmallWeChatConfiguration.validate(businessSmallWeChat);
         //businessSmallWeChat.put("weChatId", "-1");
         SmallWechatPo smallWechatPo = BeanConvertUtil.covertBean(businessSmallWeChat, SmallWechatPo.class);
         super.insert(dataFlowContext, smallWechatPo, BusinessTypeConstant.BUSINESS_TYPE_SAVE_SMALL_WE_CHAT);
@@ -56,6 +58,9 @@ public class SmallWeChatBMOImpl extends ApiBaseBMO implements ISmallWeChatBMO {
         JSONObject businessSmallWeChat = new JSONObject();
         businessSmallWeChat.putAll(BeanConvertUtil.beanCovertMap(smallWeChatDtos.get(0)));
         businessSmallWeChat.putAll(paramInJson);
+        // Updating credentials cannot change the saved account type to bypass its requirements.
+        businessSmallWeChat.put("weChatType", smallWeChatDtos.get(0).getWeChatType());
+        SmallWeChatConfiguration.validate(businessSmallWeChat);
         SmallWechatPo smallWechatPo = BeanConvertUtil.covertBean(businessSmallWeChat, SmallWechatPo.class);
         super.update(dataFlowContext, smallWechatPo, BusinessTypeConstant.BUSINESS_TYPE_UPDATE_SMALL_WE_CHAT);
     }

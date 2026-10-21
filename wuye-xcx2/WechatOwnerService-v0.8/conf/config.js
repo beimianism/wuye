@@ -8,6 +8,8 @@
  * @QQ 928255095
  */
 
+import h5Runtime from '../config/h5-runtime.js';
+const runtimeConfig = h5Runtime.publicConfig();
 // #ifdef H5
 // 服务器域名 公众号时，配置为 / 就可以
 const baseUrl = '/';
@@ -28,16 +30,16 @@ const baseUrl = 'http://127.0.0.1:8012/';
 // #endif
 
 //默认的小区ID和名称，用户还没有登录时显示的小区信息
-const DEFAULT_COMMUNITY_ID = "7020181217000001"; //HC测试小区id  用于没有登录时展示相关信息
-const DEFAULT_COMMUNITY_NAME = "丰仪家园";
+const DEFAULT_COMMUNITY_ID = runtimeConfig.communityId || "7020181217000001";
+const DEFAULT_COMMUNITY_NAME = runtimeConfig.communityName || "丰仪家园";
 
 // APP 或者 公众号  appId
-const wAppId = ""; //微信AppId
+const wAppId = runtimeConfig.appId || "";
 
 //app支付时这里需要填写支付秘钥
 const appPayKey = "";
 
-const logLevel = "DEBUG"; // 日志级别
+const logLevel = "WARN"; // 登录请求中含有凭据，不记录请求内容
 
 export default {
 	baseUrl: baseUrl,

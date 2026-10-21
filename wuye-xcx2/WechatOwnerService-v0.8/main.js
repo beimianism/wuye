@@ -1,6 +1,14 @@
 import localFeatures from './config/local-features.js'
 localFeatures.install(uni)
 import Vue from 'vue';
+// #ifdef H5
+import h5Runtime from './config/h5-runtime.js';
+h5Runtime.install(uni);
+Vue.mixin({computed:{paymentEnabled(){return h5Runtime.publicConfig().paymentEnabled === true;}}});
+// #endif
+// #ifndef H5
+Vue.mixin({computed:{paymentEnabled(){return true;}}});
+// #endif
 import App from './App';
 
 import vc from './core/vcFramework.js'

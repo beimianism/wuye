@@ -13,6 +13,7 @@
                 objId: '',
                 mchId: '',
                 remarks: '',
+                weChatType: '',
                 objTypes: '1000'
 
             }
@@ -32,9 +33,11 @@
         },
         methods: {
             editSmallWeChatValidate: function () {
-                return vc.validate.validate({
-                    editSmallWeChatInfo: vc.component.editSmallWeChatInfo
-                }, {
+                const info = vc.component.editSmallWeChatInfo;
+                const noPayment = String(info.weChatType) === '1100'
+                    && !String(info.payPassword || '').trim()
+                    && !String(info.mchId || '').trim();
+                const rules = {
                     'editSmallWeChatInfo.name': [
                         {
                             limit: "required",
@@ -105,7 +108,12 @@
                         }
                     ],
 
-                });
+                };
+                if (noPayment) {
+                    delete rules['editSmallWeChatInfo.payPassword'];
+                    delete rules['editSmallWeChatInfo.mchId'];
+                }
+                return vc.validate.validate({ editSmallWeChatInfo: info }, rules);
             },
             editSmallWeChat: function () {
                 if (!vc.component.editSmallWeChatValidate()) {
@@ -148,6 +156,7 @@
                     objId: '',
                     mchId: '',
                     remarks: '',
+                    weChatType: '',
                     objTypes: '1000'
 
                 }
