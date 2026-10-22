@@ -37,10 +37,18 @@ if (mode === 'serve') {
   if (result.error) console.error(result.error.message);
   process.exitCode = result.status == null ? 1 : result.status;
   if (mode === 'build' && !process.exitCode) {
-    const index = path.join(app, 'unpackage/dist/build/h5/index.html');
+    const output = path.join(app, 'unpackage/dist/build/h5');
+    const index = path.join(output, 'index.html');
     if (!fs.existsSync(index) || fs.statSync(index).mtimeMs < started - 1000) {
       console.error('H5 compiler did not produce a fresh index.html.');
       process.exitCode = 1;
+    } else {
+      // 旧后端的登录跳转使用 /user.html；静态站点需有同一入口。
+      fs.copyFileSync(index, path.join(output, 'user.html'));
+      const runtime = path.join(output, 'wechat-test');
+      fs.mkdirSync(runtime, {recursive: true});
+      fs.writeFileSync(path.join(runtime, 'config.js'),
+        'window.__WUYE_WECHAT_TEST__ = {paymentEnabled:false};\n');
     }
   }
 } else { console.error('Usage: node scripts/owner-h5.cjs build|dev|serve'); process.exitCode = 1; }

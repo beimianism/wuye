@@ -14,7 +14,7 @@ node scripts/owner-h5.cjs build
 node scripts/owner-h5.cjs serve
 ```
 
-构建产物为 `wuye-xcx2/WechatOwnerService-v0.8/unpackage/dist/build/h5`。静态服务器只监听 `127.0.0.1:8000`；可用 `OWNER_H5_PORT` 改端口。`Ctrl+C` 停止。构建脚本优先使用上述独立 Node，且确认产生新的 index.html；编译器出现错误却返回 0 时也不会误报成功。可选热更新命令为 `node scripts/owner-h5.cjs dev`。
+构建产物为 `wuye-xcx2/WechatOwnerService-v0.8/unpackage/dist/build/h5`。构建后还会生成与 `index.html` 相同的 `user.html`，供旧后端登录跳转使用，并生成默认关闭支付的 `wechat-test/config.js`。静态服务器只监听 `127.0.0.1:8000`；可用 `OWNER_H5_PORT` 改端口。`Ctrl+C` 停止。构建脚本优先使用上述独立 Node，且确认产生新的 index.html；编译器出现错误却返回 0 时也不会误报成功。可选热更新命令为 `node scripts/owner-h5.cjs dev`。
 
 直接打开 `http://127.0.0.1:8000/#/pages/index/index` 可检查页面。静态服务器不代理业务接口；完整联调从专用测试入口打开，使 H5、OAuth 和 `/app` 请求保持同源。开发期 manifest 中的 `/app`、`/callComponent` 代理目标仍为本机 front 端口 8012。
 
