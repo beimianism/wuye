@@ -1,6 +1,6 @@
 # 支付模块合并与远端更新
 
-目标仓库是 `https://github.com/haixiang718/wuye`。支付改动放在 `feat/payment-deploy-20261022` 分支，基于原项目的 `feat/wechat-test-integration`，保留原项目公众号测试、手动账单通知等提交。后续更新原项目时，先把上游提交合进这个分支，再构建部署；不要把旧模块目录整体覆盖回上游。
+原项目是 `https://github.com/haixiang718/wuye`；支付分支已推送到 `https://github.com/beimianism/wuye/tree/feat/payment-deploy-20261022`。支付改动基于原项目的 `feat/wechat-test-integration`，保留原项目公众号测试、手动账单通知等提交。后续更新原项目时，先把上游提交合进这个分支，再构建部署；不要把旧模块目录整体覆盖回上游。
 
 ## 目录和接口
 
@@ -11,15 +11,18 @@
 
 ## 原项目后续合并
 
-在有该功能分支的工作副本中执行：
+在有该功能分支的工作副本中执行。`origin` 指向原项目，首次使用时先添加自己的 Fork：
 
 ```bash
+git remote add fork git@github.com:beimianism/wuye.git
 git fetch origin
+git fetch fork
 git switch feat/payment-deploy-20261022
 git merge origin/feat/wechat-test-integration
+git push fork feat/payment-deploy-20261022
 ```
 
-冲突时保留原项目后续的业务改动，同时核对 `WechatPayAdapt` 普通商户校验、`OwnerAppLoginSMOImpl` OAuth 错误处理和支付通知的签名、金额、订单校验。合并后运行下面的构建与测试，再部署。若功能分支尚未推送到 GitHub，可从本机工作副本 `/home/x1908/workwork/wuye-upstream-20261022` 获取。
+如是新工作副本，先执行 `git switch -c feat/payment-deploy-20261022 --track fork/feat/payment-deploy-20261022`。冲突时保留原项目后续的业务改动，同时核对 `WechatPayAdapt` 普通商户校验、`OwnerAppLoginSMOImpl` OAuth 错误处理和支付通知的签名、金额、订单校验。合并后运行下面的构建与测试，再部署。
 
 ## 快速部署步骤
 
@@ -39,4 +42,4 @@ git merge origin/feat/wechat-test-integration
 - 管理后台静态页面已与业主 H5 共用站点，入口为 `/staff-login.html`、`/admin.html`；保留业主 `/user.html`，通过独立 HTTP Basic Auth 保护后台入口和 `/callComponent/` 代理。公网验证后台入口未认证 401、认证 200、后台登录元信息接口认证 200、业主 H5 200；尚未完成真实管理员账号登录及所有管理模块操作验收。后台入口更新可执行 `deploy/deploy-admin-static.sh /opt/1panel/www/sites/wuye-h5/index`，认证文件和 OpenResty 规则需在服务器私有配置中保留。
 - 测试号服务器校验已迁移到 `/app/wechat/testCallback`，Token 仅在服务器 `wechat.env`；公网签名正确的 GET 返回原样 `echostr` 与 HTTP 200，缺少签名返回 403。旧本地隧道 `/wechat-test/callback` 在固定站点返回 404，不应再填入平台。已运行回调测试 3 项与公众号 OAuth 测试 11 项。
 - 后台社区列表联调发现 MySQL `ONLY_FULL_GROUP_BY` 与旧查询不兼容，已只修改 `getCommunityInfoNew` 的分组字段并重建、重启 `community`。其后列表查询还依赖 `common-service` 获取城市名称。曾临时启动 `common` 验证依赖，但服务器 3.6 GiB 内存、3 GiB 交换空间几乎用尽，已将其停止；当前维持七个支付链路业务服务。后台静态入口和登录元信息可访问，社区列表与依赖 `common` 的后台页面不构成线上验收。后续业务回归优先在本地进行，扩容后再决定是否部署更多服务。
-- GitHub 推送因当前环境没有写入认证失败；功能分支保留在本地工作副本。工作区另有 `modules/wechatpay-integration/patches/wuye-payment-integration-20261022.patch` 和 `apply-upstream.sh`，已在 `feat/wechat-test-integration` 基线工作树实际应用并与功能分支逐字节比对通过。
+- 功能分支已推送到 `beimianism/wuye`。工作区另有 `modules/wechatpay-integration/patches/wuye-payment-integration-20261022.patch` 和 `apply-upstream.sh`，便于在原项目功能分支上快速应用与复核；补丁已通过 `git apply --check --reverse` 校验。
