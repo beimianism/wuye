@@ -72,9 +72,16 @@ public class OwnerWechatOAuthTest {
         Field field = OwnerAppLoginSMOImpl.class.getDeclaredField(name); field.setAccessible(true); field.set(service,value);
     }
     private HttpServletRequest request() {
+        return request(null);
+    }
+    private HttpServletRequest request(final String wAppId) {
         return (HttpServletRequest) java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),
             new Class[]{HttpServletRequest.class}, new InvocationHandler() {
-                @Override public Object invoke(Object proxy, Method method, Object[] args) { return null; }
+                @Override public Object invoke(Object proxy, Method method, Object[] args) {
+                    if ("getHeader".equals(method.getName()) && args != null && args.length == 1
+                            && "w-app-id".equals(args[0])) return wAppId;
+                    return null;
+                }
             });
     }
     private IPageData pd(JSONObject data) {
@@ -102,6 +109,26 @@ public class OwnerWechatOAuthTest {
         assertNotEquals(first.getString("state"),second.getString("state"));
         assertEquals("992020061452450002",first.getString("appId"));
         assertFalse(first.toJSONString().contains("test-secret"));
+    }
+    @Test public void suppliedTestAccountAppIdUsesMatchingServerConfiguration() throws Exception {
+        ResponseEntity<String> reply = service.refreshToken(pd(new JSONObject()),
+                "https://example.test/user.html#/pages/index/index?wAppId=wx-test",
+                "/#/pages/showlogin/showlogin?wAppId=wx-test", "0", request("wx-test"), null);
+        String open = JSONObject.parseObject(reply.getBody()).getJSONObject("data").getString("openUrl");
+        Map<String,String> auth = query(open.substring(0, open.indexOf('#')));
+        assertEquals("wx-test", auth.get("appid"));
+        assertTrue(auth.get("redirect_uri"), auth.get("redirect_uri").startsWith(
+                "https://example.test/app/loginOwnerWechatAuth?"));
+        assertFalse(open.contains("test-secret"));
+    }
+    @Test public void differentAppIdDoesNotUseServerTestAccount() throws Exception {
+        try {
+            service.refreshToken(pd(new JSONObject()), "https://example.test/#/home",
+                    "/#/pages/showlogin/showlogin", "0", request("wx-other"), null);
+            fail("unknown account accepted");
+        } catch (IllegalArgumentException expected) {
+            assertEquals("Public WeChat account is not configured", expected.getMessage());
+        }
     }
     @Test public void callbackRejectsWrongStateBeforeWeChatRequest() throws Exception {
         JSONObject callback=begin(); callback.put("state","wrong");

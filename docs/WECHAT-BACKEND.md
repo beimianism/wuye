@@ -10,7 +10,7 @@
 
 `small_wechat` 和 `buiness_small_wechat` 的 `pay_password`、`mch_id` 均为 NOT NULL（已核对恢复的本地 MySQL 元数据和仓库建表 SQL）。未开通支付存为两个空字符串，无须改表。清空已有支付配置时，实例更新 SQL 也会写入两个空字符串。微信支付适配器在任何缓存或外部下单请求之前，明确拒绝未配置的支付。
 
-公众号可以来自管理后台记录；请求头 `w-app-id` 是微信的 `wx...` AppID。指定了此头却未找到公众号配置时拒绝授权，不回退到其他账号。未指定时使用外置 Spring 配置：
+公众号可以来自管理后台记录；请求头 `w-app-id` 是微信的 `wx...` AppID。未指定此头，或它与服务器外置配置中的测试号 AppID 完全相同时，使用外置 Spring 配置。指定其他 AppID 时必须找到对应的公众号数据库记录，否则拒绝授权，不回退到测试号：
 
 ```properties
 java110.auth.wechat.wechatAppId=<测试号AppID>

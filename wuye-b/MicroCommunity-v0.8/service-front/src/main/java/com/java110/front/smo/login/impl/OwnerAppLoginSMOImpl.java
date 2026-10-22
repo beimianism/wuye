@@ -363,17 +363,19 @@ public class OwnerAppLoginSMOImpl extends AbstractFrontServiceSMO implements IOw
 
     private SmallWeChatDto getPublicWechat(IPageData pd, String appId) {
         SmallWeChatDto config;
-        if (!StringUtil.isEmpty(appId)) {
+        if (StringUtil.isEmpty(appId) || appId.equals(wechatAuthProperties.getWechatAppId())) {
+            // The public test account may be configured only through server environment variables.
+            // Reuse it only when the requested AppID matches exactly; other accounts still use the database.
+            config = new SmallWeChatDto();
+            config.setAppId(wechatAuthProperties.getWechatAppId());
+            config.setAppSecret(wechatAuthProperties.getWechatAppSecret());
+        } else {
             JSONObject lookup = new JSONObject();
             lookup.put("appId", appId);
             config = getSmallWechat(pd, lookup);
             if (config == null || !SmallWeChatDto.WECHAT_TYPE_PUBLIC.equals(config.getWeChatType())) {
                 throw new IllegalArgumentException("Public WeChat account is not configured");
             }
-        } else {
-            config = new SmallWeChatDto();
-            config.setAppId(wechatAuthProperties.getWechatAppId());
-            config.setAppSecret(wechatAuthProperties.getWechatAppSecret());
         }
         if (StringUtil.isEmpty(config.getAppId()) || StringUtil.isEmpty(config.getAppSecret())) {
             throw new IllegalArgumentException("Public WeChat AppID and AppSecret are required");

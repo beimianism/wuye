@@ -33,7 +33,8 @@ git merge origin/feat/wechat-test-integration
 
 ## 2026-10-22 部署记录
 
-- 全量 Maven `package` 成功；支付未配置拒绝测试 1 项、公众号 OAuth 测试 9 项通过。H5 支付测试、本地业主测试和配置测试已通过。
+- 全量 Maven `package` 成功；支付未配置拒绝测试 1 项、公众号 OAuth 测试 11 项通过。H5 支付测试、本地业主测试和配置测试已通过。测试号 AppID 仅在与服务器外置 AppID 完全相同时使用外置公众号配置，修复了传入 `w-app-id` 后被错误要求数据库记录的问题；新前台 JAR 已部署，线上 `/app/refreshToken` 返回相同 AppID 与 `luci-ona.site` 回调域名。
 - 业主 H5 已部署；从服务器外验证 TLS、`/`、`/user.html`、CSS 和 JavaScript 资源均正常。七个支付链路服务在 Eureka 注册；未登录支付状态查询返回 401；普通缴费和欠费通知从公网收到无效 XML 均返回微信格式的 `FAIL`。本次仅启动支付所需七个业务服务，`job`、`report`、`goods` 等其他业务服务尚未启动。
 - 服务器前台服务环境变量尚未配置正式商户号和 APIv2 密钥，数据库商户记录尚未核验；H5 `paymentEnabled:false`，没有执行真实 JSAPI 扣款。订单与通知幂等状态仍依赖 Redis，持久流水、数据库唯一约束和微信查单补偿尚未实现。现阶段是支付代码与基础链路部署，不能作为正式收款验收。
+- 管理后台独立 Web 源码尚未部署到当前公网站点；`/admin.html` 和管理后台所需 `/css/` 路径当前返回 404。线上仅运行支付链路需要的部分业务服务，因此不能以现有站点作为完整管理后台验收。
 - GitHub 推送因当前环境没有写入认证失败；功能分支保留在本地工作副本。工作区另有 `modules/wechatpay-integration/patches/wuye-payment-integration-20261022.patch` 和 `apply-upstream.sh`，已在 `feat/wechat-test-integration` 基线工作树实际应用并与功能分支逐字节比对通过。

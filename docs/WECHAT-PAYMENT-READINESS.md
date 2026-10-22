@@ -55,4 +55,6 @@
 
 2026-10-22 已在服务器验证 `luci-ona.site` 的 HTTPS 站点和应用路由。公众号测试号后台的网页授权域名填 `luci-ona.site`（不带协议和路径）；正式支付商户平台的 JSAPI 授权目录按当前 H5 单页应用可先设为 `https://luci-ona.site/`，再用真实付款页面验证目录匹配。支付通知地址已由公网反向代理开放。
 
+遇到微信 `redirect_uri` 域名不一致（10003）时，进入**该测试号 AppID 对应**的测试平台「网页授权获取用户基本信息」，将授权回调页面域名改为 `luci-ona.site` 并保存。此项与「JS 接口安全域名」、消息接口 URL/Token、商户平台 JSAPI 支付授权目录是不同配置；旧的 Pinggy 域名不适用于当前站点。服务端已验证生成的 OAuth `redirect_uri` 为 `https://luci-ona.site/app/loginOwnerWechatAuth?...`，且 OAuth URL 使用测试号 AppID。若平台已保存正确域名但仍报 10003，应从 `https://luci-ona.site/` 重新打开入口，并核对当前页面 URL 与 OAuth URL 的 `appid`、`redirect_uri`，避免沿用旧临时入口或缓存的账号链接。[微信支付官方 10003 排查](https://pay.weixin.qq.com/doc/v2/merchant/4011935211)。
+
 已运行 H5 桥接与状态轮询测试、业主端本地功能测试、Python 配置测试；服务器 Java 打包及支付未配置拒绝、公众号 OAuth 定向测试通过。此前测试号已完成一次手机微信授权登录与账单查看；本次重新部署后仍需真机回归，不等于完成正式商户支付联调。公众号接口测试号不能替代已认证并绑定商户号的正式公众号进行真实 JSAPI 支付；`wechatpay-dev-cli` 主要面向 APIv3 查单排障，也不能直接代替本项目的 APIv2 统一下单联调。[APIv2 JSAPI 接入准备](https://pay.wechatpay.cn/doc/v2/merchant/4011935208)、[微信支付开发 CLI](https://pay.wechatpay.cn/doc/v3/merchant/4019638116)。
