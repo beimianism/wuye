@@ -19,15 +19,21 @@ import com.java110.core.base.controller.BaseController;
 import com.java110.core.context.IPageData;
 import com.java110.core.context.PageData;
 import com.java110.front.smo.payment.*;
+import com.java110.front.smo.payment.adapt.wechatPay.WechatPayCallbackValidator;
+import com.java110.dto.fee.FeeDto;
+import com.java110.utils.cache.CommonCache;
 import com.java110.utils.constant.CommonConstant;
 import com.java110.utils.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,6 +69,23 @@ public class PaymentController extends BaseController {
 
     @Autowired
     private IToQrPayOweFeeSMO toQrPayOweFeeSMOImpl;
+
+    /** H5 调起后只读取已完成业务确认的状态，不根据前端支付回调判定成功。 */
+    @RequestMapping(path = "/status", method = RequestMethod.GET)
+    public ResponseEntity<String> status(@RequestParam("orderId") String orderId, HttpServletRequest request) {
+        IPageData pd = (IPageData) request.getAttribute(CommonConstant.CONTEXT_PAGE_DATA);
+        if (pd == null || pd.getUserId() == null || "-1".equals(pd.getUserId()) || orderId == null
+                || !orderId.matches("[A-Za-z0-9_-]{1,64}")
+                || !WechatPayCallbackValidator.belongsTo(orderId, pd.getUserId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        boolean paid = "1".equals(CommonCache.getValue("WECHAT_PAY_FEE_PAID_" + orderId))
+                || "1".equals(CommonCache.getValue(FeeDto.REDIS_PAY_OWE_FEE + "PAID_" + orderId));
+        JSONObject result = new JSONObject();
+        result.put("code", "0");
+        result.put("status", paid ? "PAID" : "PENDING");
+        return new ResponseEntity<>(result.toJSONString(), HttpStatus.OK);
+    }
 
     /**
      * <p>统一下单入口</p>
@@ -135,8 +158,6 @@ public class PaymentController extends BaseController {
     @RequestMapping(path = "/notify", method = RequestMethod.POST)
     public ResponseEntity<String> notify(@RequestBody String postInfo, HttpServletRequest request) {
 
-        logger.debug("微信支付回调报文" + postInfo);
-
         return toNotifySMOImpl.toNotify(postInfo, request);
 
 
@@ -170,8 +191,6 @@ public class PaymentController extends BaseController {
      */
     @RequestMapping(path = "/oweFeeNotify", method = RequestMethod.POST)
     public ResponseEntity<String> oweFeeNotify(@RequestBody String postInfo, HttpServletRequest request) {
-        logger.debug("微信支付回调报文" + postInfo);
-
         return oweFeeToNotifySMOImpl.toNotify(postInfo, request);
     }
 
@@ -183,8 +202,6 @@ public class PaymentController extends BaseController {
      */
     @RequestMapping(path = "/rentingNotify", method = RequestMethod.POST)
     public ResponseEntity<String> rentingNotify(@RequestBody String postInfo, HttpServletRequest request) {
-
-        logger.debug("微信支付回调报文" + postInfo);
 
         return rentingToNotifySMOImpl.toNotify(postInfo, request);
 

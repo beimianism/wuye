@@ -15,7 +15,6 @@
  */
 package com.java110.front.smo.payment.adapt.wechatPay;
 
-import com.java110.core.factory.WechatFactory;
 import com.java110.dto.smallWeChat.SmallWeChatDto;
 import com.java110.front.properties.WechatAuthProperties;
 import com.java110.front.smo.payment.adapt.IPayAdapt;
@@ -55,10 +54,6 @@ public class WechatPayAdapt implements IPayAdapt {
     public static final String WECHAT_SERVICE_PAY_SWITCH_ON = "ON";
 
 
-    private static final String WECHAT_SERVICE_APP_ID = "SERVICE_APP_ID";
-
-    private static final String WECHAT_SERVICE_MCH_ID = "SERVICE_MCH_ID";
-
     @Autowired
     private WechatAuthProperties wechatAuthProperties;
 
@@ -95,10 +90,13 @@ public class WechatPayAdapt implements IPayAdapt {
                 || StringUtil.isEmpty(smallWeChatDto.getPayPassword())) {
             throw new IllegalArgumentException("微信支付未开通：请先配置商户ID与支付密码");
         }
-        logger.info("【小程序支付】 统一下单开始, 订单编号=" + orderNum);
+        logger.info("【微信支付】 统一下单开始, 订单编号=" + orderNum);
+        if (WECHAT_SERVICE_PAY_SWITCH_ON.equals(MappingCache.getValue(DOMAIN_WECHAT_PAY, WECHAT_SERVICE_PAY_SWITCH))) {
+            throw new IllegalStateException("当前微信支付模块只支持普通商户模式，服务商模式尚未接入");
+        }
         SortedMap<String, String> resultMap = new TreeMap<String, String>();
-        //生成支付金额，开发环境处理支付金额数到0.01、0.02、0.03元
-        double payAmount = PayUtil.getPayAmountByEnv(MappingCache.getValue("HC_ENV"), money);
+        // 实付金额必须与服务端生成的业务订单一致，不能按运行环境改写。
+        double payAmount = money;
         //添加或更新支付记录(参数跟进自己业务需求添加)
 
         Map<String, String> resMap = null;
@@ -109,7 +107,18 @@ public class WechatPayAdapt implements IPayAdapt {
             resMap = this.java110UnifieldOrder(outRestTemplate, feeName, orderNum, tradeType, payAmount, openId, smallWeChatDto, notifyUrl);
         }
 
+        if ("SUCCESS".equals(resMap.get("return_code"))) {
+            String responseSign = PayUtil.createSign(new TreeMap<>(resMap), smallWeChatDto.getPayPassword());
+            if (!responseSign.equals(resMap.get("sign"))
+                    || !smallWeChatDto.getAppId().equals(resMap.get("appid"))
+                    || !smallWeChatDto.getMchId().equals(resMap.get("mch_id"))) {
+                throw new IllegalArgumentException("微信统一下单应答验签或商户信息校验失败");
+            }
+        }
         if ("SUCCESS".equals(resMap.get("return_code")) && "SUCCESS".equals(resMap.get("result_code"))) {
+            if (StringUtil.isEmpty(resMap.get("prepay_id"))) {
+                throw new IllegalArgumentException("微信统一下单未返回预支付标识");
+            }
             if (WechatAuthProperties.TRADE_TYPE_JSAPI.equals(tradeType)) {
 
                 resultMap.put("appId", smallWeChatDto.getAppId());
@@ -131,12 +140,13 @@ public class WechatPayAdapt implements IPayAdapt {
                 resultMap.put("codeUrl", resMap.get("code_url"));
             }
             resultMap.put("code", "0");
+            resultMap.put("orderId", orderNum);
             resultMap.put("msg", "下单成功");
-            logger.info("【小程序支付】统一下单成功，返回参数:" + resultMap);
+            logger.info("【微信支付】统一下单成功，订单编号={}", orderNum);
         } else {
             resultMap.put("code", resMap.get("return_code"));
             resultMap.put("msg", resMap.get("return_msg"));
-            logger.info("【小程序支付】统一下单失败，失败原因:" + resMap.get("return_msg"));
+            logger.info("【微信支付】统一下单失败，失败原因:" + resMap.get("return_msg"));
         }
         return resultMap;
     }
@@ -165,31 +175,30 @@ public class WechatPayAdapt implements IPayAdapt {
         paramMap.put("nonce_str", PayUtil.makeUUID(32));
         paramMap.put("body", systemName + feeName);
         paramMap.put("out_trade_no", orderNum);
-        paramMap.put("total_fee", PayUtil.moneyToIntegerStr(payAmount));
+        String totalFee = PayUtil.moneyToIntegerStr(payAmount);
+        paramMap.put("total_fee", totalFee);
         paramMap.put("spbill_create_ip", PayUtil.getLocalIp());
-        paramMap.put("notify_url", notifyUrl + "?wId=" + WechatFactory.getWId(smallWeChatDto.getAppId()));
-        paramMap.put("trade_type", tradeType);
-        paramMap.put("openid", openid);
-
-        String paySwitch = MappingCache.getValue(DOMAIN_WECHAT_PAY, WECHAT_SERVICE_PAY_SWITCH);
-        if (WECHAT_SERVICE_PAY_SWITCH_ON.equals(paySwitch)) {
-            paramMap.put("appid", MappingCache.getValue(DOMAIN_WECHAT_PAY, WECHAT_SERVICE_APP_ID));  //服务商appid，是服务商注册时公众号的id
-            paramMap.put("mch_id", MappingCache.getValue(DOMAIN_WECHAT_PAY, WECHAT_SERVICE_MCH_ID));  //服务商商户号
-            paramMap.put("sub_appid", smallWeChatDto.getAppId());//起调小程序appid
-            paramMap.put("sub_mch_id", smallWeChatDto.getMchId());//起调小程序的商户号
-            paramMap.put("sub_openid", openid);
-            paramMap.remove("openid");
+        if (notifyUrl == null || !notifyUrl.startsWith("https://") || notifyUrl.contains("?")) {
+            throw new IllegalArgumentException("微信支付通知地址必须是无参数的公网 HTTPS 地址");
         }
+        paramMap.put("notify_url", notifyUrl);
+        paramMap.put("attach", WechatPayCallbackValidator.createAttach(smallWeChatDto.getAppId(), totalFee));
+        paramMap.put("trade_type", tradeType);
+        if (WechatAuthProperties.TRADE_TYPE_JSAPI.equals(tradeType)) {
+            if (StringUtil.isEmpty(openid)) {
+                throw new IllegalArgumentException("JSAPI 支付缺少用户 OpenID");
+            }
+            paramMap.put("openid", openid);
+        }
+
+        WechatPayCallbackValidator.recordOrder(orderNum, smallWeChatDto, openid, totalFee, tradeType);
+
         paramMap.put("sign", PayUtil.createSign(paramMap, smallWeChatDto.getPayPassword()));
 //转换为xml
         String xmlData = PayUtil.mapToXml(paramMap);
 
-        logger.debug("调用支付统一下单接口" + xmlData);
-
         ResponseEntity<String> responseEntity = outRestTemplate.postForEntity(
                 wechatAuthProperties.getWxPayUnifiedOrder(), xmlData, String.class);
-
-        logger.debug("统一下单返回" + responseEntity);
 //请求微信后台，获取预支付ID
         if (responseEntity.getStatusCode() != HttpStatus.OK) {
             throw new IllegalArgumentException("支付失败" + responseEntity.getBody());

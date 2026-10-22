@@ -17,7 +17,6 @@ package com.java110.front.smo.payment.adapt.wechatPay;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.java110.core.factory.WechatFactory;
 import com.java110.dto.fee.FeeDto;
 import com.java110.dto.smallWeChat.SmallWeChatDto;
 import com.java110.front.properties.WechatAuthProperties;
@@ -25,6 +24,7 @@ import com.java110.front.smo.payment.adapt.IOweFeeToNotifyAdapt;
 import com.java110.utils.cache.CommonCache;
 import com.java110.utils.constant.CommonConstant;
 import com.java110.utils.constant.ServiceConstant;
+import com.java110.utils.lock.DistributedLock;
 import com.java110.utils.util.BeanConvertUtil;
 import com.java110.utils.util.DateUtil;
 import com.java110.utils.util.PayUtil;
@@ -70,7 +70,7 @@ public class WechatOweFeeToNotifyAdapt implements IOweFeeToNotifyAdapt {
         String resXml = "";
         try {
             Map<String, Object> map = PayUtil.getMapFromXML(param);
-            logger.info("【小程序支付回调】 回调数据： \n" + map);
+            logger.info("【微信支付回调】 收到通知，订单编号={}", map.get("out_trade_no"));
             String returnCode = (String) map.get("return_code");
             if ("SUCCESS".equalsIgnoreCase(returnCode)) {
                 String returnmsg = (String) map.get("result_code");
@@ -81,6 +81,9 @@ public class WechatOweFeeToNotifyAdapt implements IOweFeeToNotifyAdapt {
                         //支付成功
                         resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
                                 + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml>";
+                    } else {
+                        resXml = "<xml><return_code><![CDATA[FAIL]]></return_code>"
+                                + "<return_msg><![CDATA[业务确认未完成]></return_msg></xml>";
                     }
                 } else {
                     resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
@@ -103,17 +106,8 @@ public class WechatOweFeeToNotifyAdapt implements IOweFeeToNotifyAdapt {
 
 
     public int confirmPayFee(Map<String, Object> map) {
-        String wId = map.get("wId").toString();
-        wId = wId.replace(" ", "+");
-        SortedMap<String, String> paramMap = new TreeMap<String, String>();
         ResponseEntity<String> responseEntity = null;
-        for (String key : map.keySet()) {
-            if ("wId".equals(key)) {
-                continue;
-            }
-            paramMap.put(key, map.get(key).toString());
-        }
-        String appId = WechatFactory.getAppId(wId);
+        String appId = WechatPayCallbackValidator.getAppId(map);
         SmallWeChatDto smallWeChatDto = getSmallWechat(appId);
 
         if (smallWeChatDto == null) { //从配置文件中获取 小程序配置信息
@@ -123,30 +117,46 @@ public class WechatOweFeeToNotifyAdapt implements IOweFeeToNotifyAdapt {
             smallWeChatDto.setMchId(wechatAuthProperties.getMchId());
             smallWeChatDto.setPayPassword(wechatAuthProperties.getKey());
         }
-        String sign = PayUtil.createSign(paramMap, smallWeChatDto.getPayPassword());
-
-        if (!sign.equals(map.get("sign"))) {
-            throw new IllegalArgumentException("鉴权失败");
-        }
+        WechatPayCallbackValidator.verify(map, smallWeChatDto);
 
         String orderId = map.get("out_trade_no").toString();
-        String order = CommonCache.getAndRemoveValue(FeeDto.REDIS_PAY_OWE_FEE + orderId);
-
-        if (StringUtil.isEmpty(order)) {
-            return 1;// 说明已经处理过了 再不处理
-        }
-
-        //查询用户ID
-        JSONObject paramIn = JSONObject.parseObject(order);
-        paramIn.put("oId", orderId);
-        freshFees(paramIn);
-        String url = ServiceConstant.SERVICE_API_URL + "/api/fee.payOweFee";
-        responseEntity = this.callCenterService(restTemplate, "-1", paramIn.toJSONString(), url, HttpMethod.POST);
-
-        if (responseEntity.getStatusCode() != HttpStatus.OK) {
+        String paidKey = FeeDto.REDIS_PAY_OWE_FEE + "PAID_" + orderId;
+        String lockKey = FeeDto.REDIS_PAY_OWE_FEE + "LOCK_" + orderId;
+        String lockId = DistributedLock.getLockUUID();
+        if (!DistributedLock.tryGetDistributedLock(lockKey, lockId, 60 * 1000)) {
             return 0;
         }
-        return 1;
+        try {
+            if ("1".equals(CommonCache.getValue(paidKey))) {
+                return 1;
+            }
+            String order = CommonCache.getValue(FeeDto.REDIS_PAY_OWE_FEE + orderId);
+            if (StringUtil.isEmpty(order)) {
+                logger.error("微信支付订单缺少待销账数据，订单号：{}", orderId);
+                return 0;
+            }
+
+            JSONObject paramIn = JSONObject.parseObject(order);
+            if (!PayUtil.moneyToIntegerStr(paramIn.getDouble("money")).equals(map.get("total_fee"))) {
+                throw new IllegalArgumentException("欠费订单金额与微信支付通知不一致");
+            }
+            paramIn.put("oId", orderId);
+            freshFees(paramIn);
+            String url = ServiceConstant.SERVICE_API_URL + "/api/fee.payOweFee";
+            responseEntity = this.callCenterService(restTemplate, "-1", paramIn.toJSONString(), url, HttpMethod.POST);
+            if (responseEntity.getStatusCode() != HttpStatus.OK || responseEntity.getBody() == null) {
+                return 0;
+            }
+            JSONObject businessResult = JSONObject.parseObject(responseEntity.getBody());
+            if (!businessResult.containsKey("code") || businessResult.getIntValue("code") != 0) {
+                return 0;
+            }
+            CommonCache.setValue(paidKey, "1");
+            CommonCache.removeValue(FeeDto.REDIS_PAY_OWE_FEE + orderId);
+            return 1;
+        } finally {
+            DistributedLock.releaseDistributedLock(lockKey, lockId);
+        }
     }
 
     private void freshFees(JSONObject paramIn) {
@@ -192,7 +202,7 @@ public class WechatOweFeeToNotifyAdapt implements IOweFeeToNotifyAdapt {
         } catch (Exception e) {
             responseEntity = new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } finally {
-            logger.debug("请求地址为,{} 请求中心服务信息，{},中心服务返回信息，{}", url, httpEntity, responseEntity);
+            logger.debug("中心服务调用完成，状态={}", responseEntity.getStatusCode());
         }
 
         return responseEntity;

@@ -153,7 +153,7 @@ public class PayOweFeeImpl implements IPayOweFee {
             logger.error("缴费失败", e);
             throw new IllegalArgumentException("缴费失败" + e);
         } finally {
-            DistributedLock.releaseDistributedLock(requestId, key);
+            DistributedLock.releaseDistributedLock(key, requestId);
         }
     }
 

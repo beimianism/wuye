@@ -102,7 +102,7 @@ public class ToPaySMOImpl extends AppAbstractComponentSMO implements IToPaySMO {
         tmpParamIn.put("userId", pd.getUserId());
         tmpParamIn.put("appType", appType);
         responseEntity = super.getOwnerAppUser(pd, restTemplate, tmpParamIn);
-        logger.debug("查询用户信息返回报文：" + responseEntity);
+
         if (responseEntity.getStatusCode() != HttpStatus.OK) {
             throw new IllegalArgumentException("未查询用户信息异常" + tmpParamIn);
         }
@@ -121,6 +121,9 @@ public class ToPaySMOImpl extends AppAbstractComponentSMO implements IToPaySMO {
         //支付适配器
         IPayAdapt tPayAdapt = ApplicationContextFactory.getBean(payAdapt, IPayAdapt.class);
         Map result = tPayAdapt.java110Payment(outRestTemplate, paramIn.getString("feeName"), paramIn.getString("tradeType"), orderId, money, openId, smallWeChatDto);
+        if ("0".equals(result.get("code")) && "wechatPayAdapt".equals(payAdapt)) {
+            com.java110.front.smo.payment.adapt.wechatPay.WechatPayCallbackValidator.bindOwner(orderId, pd.getUserId());
+        }
         responseEntity = new ResponseEntity(JSONObject.toJSONString(result), HttpStatus.OK);
 
         return responseEntity;

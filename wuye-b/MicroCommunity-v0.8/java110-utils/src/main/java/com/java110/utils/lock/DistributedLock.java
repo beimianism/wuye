@@ -56,6 +56,19 @@ public class DistributedLock extends BaseCache {
         }
     }
 
+    /** 只尝试一次；支付回调未获得锁时交由微信稍后重试。 */
+    public static boolean tryGetDistributedLock(String lockKey, String requestId, int expireTime) {
+        Jedis redis = null;
+        try {
+            redis = getJedis();
+            return tryGetDistributedLock(redis, lockKey, requestId, expireTime);
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
 
     /**
      * 尝试获取分布式锁

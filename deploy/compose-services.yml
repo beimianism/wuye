@@ -1,0 +1,96 @@
+name: wuye-services
+
+# Paths match the source package installed under /srv/wuye/source on the server.
+# MySQL, Redis, Kafka, ZooKeeper, Eureka and OpenResty are all reached on the host.
+x-java-service: &java-service
+  image: maven:3.9.9-eclipse-temurin-8
+  network_mode: host
+  restart: unless-stopped
+  working_dir: /tmp
+  volumes:
+    - /srv/wuye/source/wuye-b/MicroCommunity-v0.8:/srv/source:ro
+    - /srv/wuye/runtime/config:/etc/wuye:ro
+  entrypoint:
+    - /bin/sh
+    - -ec
+    - >-
+      export SPRING_APPLICATION_JSON="$$(cat /etc/wuye/$${WUYE_SERVICE}.json)";
+      exec java -Xms64m -Xmx256m -Dfile.encoding=UTF-8
+      -jar /srv/source/service-$${WUYE_SERVICE}/target/service-$${WUYE_SERVICE}.jar
+      --spring.profiles.active=$${WUYE_PROFILE:-prod}
+
+services:
+  order:
+    <<: *java-service
+    container_name: wuye-order
+    environment:
+      WUYE_SERVICE: order
+
+  user:
+    <<: *java-service
+    container_name: wuye-user
+    environment:
+      WUYE_SERVICE: user
+
+  acct:
+    <<: *java-service
+    container_name: wuye-acct
+    environment:
+      WUYE_SERVICE: acct
+
+  common:
+    <<: *java-service
+    container_name: wuye-common
+    environment:
+      WUYE_SERVICE: common
+
+  store:
+    <<: *java-service
+    container_name: wuye-store
+    environment:
+      WUYE_SERVICE: store
+
+  report:
+    <<: *java-service
+    container_name: wuye-report
+    environment:
+      WUYE_SERVICE: report
+
+  api:
+    <<: *java-service
+    container_name: wuye-api
+    environment:
+      WUYE_SERVICE: api
+
+  community:
+    <<: *java-service
+    container_name: wuye-community
+    environment:
+      WUYE_SERVICE: community
+
+  fee:
+    <<: *java-service
+    container_name: wuye-fee
+    environment:
+      WUYE_SERVICE: fee
+
+  front:
+    <<: *java-service
+    container_name: wuye-front-smoke
+    env_file:
+      - /srv/wuye/runtime/config/wechat.env
+    environment:
+      WUYE_SERVICE: front
+
+  job:
+    <<: *java-service
+    container_name: wuye-job
+    environment:
+      WUYE_SERVICE: job
+      WUYE_PROFILE: dev
+
+  goods:
+    <<: *java-service
+    container_name: wuye-goods
+    environment:
+      WUYE_SERVICE: goods

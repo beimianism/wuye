@@ -1,74 +1,70 @@
-/*
-	微信支付方法(uni-app h5)适用
-	获取微信加签信息
-	@param{data}:获取的微信加签
-	@param{res}:成功回调
-	@param{fail}:失败回调
-	
-	@warn:因为package为严格模式下的保留字，不能用作变量.
-	@use
-	
-		wPay({
-			appId,
-			timeStamp,
-			nonceStr,
-			signature,
-			package,
-			paySign
-		},res=>{
-			console.log(‘调用成功!‘);
-		},fail=>{
-			console.log(‘调用失败!‘);
-		})
-*/
-const wx = require('jweixin-module');
+/* 微信内公众号 H5 的 JSAPI 支付调起。支付签名由服务端生成。 */
+import {getHeaders} from '../api/java110Request.js';
+import url from '../constant/url.js';
 
 class WexinPayFactory {
-	wexinPay(data, successCallBack) {
-
-		let [appId, timestamp, nonceStr, signature, packages, paySign] = [data.appId, data.timeStamp, data.nonceStr, data.sign,
-			data.package, data.sign
-		];
-
-		wx.config({
-			debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-			appId, // 必填，公众号的唯一标识
-			timestamp, // 必填，生成签名的时间戳
-			nonceStr, // 必填，生成签名的随机串
-			signature, // 必填，签名，见附录1
-			jsApiList: ['chooseWXPay'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
-		});
-
-		wx.ready(function() {
-			wx.chooseWXPay({
-				timestamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
-				nonceStr, // 支付签名随机串，不长于 32 位
-				'package': packages, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
-				signType: 'MD5', // 签名方式，默认为‘SHA1‘，使用新版支付需传入‘MD5‘
-				paySign, // 支付签名
-				success(res) {
-					// 支付成功后的回调函数
-					successCallBack(res);
-				},
-				fail(res) {
-					uni.showToast({
-						icon: 'none',
-						title: '支付失败'
-					})
-
+	wexinPay(data, successCallBack, failureCallBack) {
+		if (!data || !data.orderId || !data.appId || !data.sign) {
+			uni.showToast({ icon: 'none', title: '支付参数不完整' });
+			return;
+		}
+		const invokePay = () => {
+			window.WeixinJSBridge.invoke('getBrandWCPayRequest', {
+				appId: data.appId,
+				timeStamp: data.timeStamp,
+				nonceStr: data.nonceStr,
+				package: data.package,
+				signType: data.signType,
+				paySign: data.sign
+			}, result => {
+				if (result.err_msg === 'get_brand_wcpay_request:ok') {
+					this.confirmPayment(data.orderId, successCallBack);
 					return;
 				}
+				if (failureCallBack) {
+					failureCallBack(result);
+				}
+				uni.showToast({
+					icon: 'none',
+					title: result.err_msg === 'get_brand_wcpay_request:cancel' ? '已取消支付' : '支付失败'
+				});
 			});
-		});
+		};
 
-		wx.error(function(res) {
-			// config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
-			/*alert("config信息验证失败");*/
+		if (window.WeixinJSBridge) {
+			invokePay();
+			return;
+		}
+		document.addEventListener('WeixinJSBridgeReady', invokePay, { once: true });
+	}
+
+	confirmPayment(orderId, successCallBack, remaining = 8) {
+		uni.request({
+			url: url.paymentStatus + '?orderId=' + encodeURIComponent(orderId),
+			header: Object.assign({}, getHeaders(), { 'X-Requested-With': 'XMLHttpRequest' }),
+			method: 'GET',
+			success: response => {
+				if (response.statusCode === 200 && response.data && response.data.status === 'PAID') {
+					successCallBack(response.data);
+					return;
+				}
+				if (response.statusCode === 401 || response.statusCode === 403) {
+					uni.showToast({ icon: 'none', title: '登录已失效，请重新进入公众号页面' });
+					return;
+				}
+				this.waitForConfirmation(orderId, successCallBack, remaining);
+			},
+			fail: () => this.waitForConfirmation(orderId, successCallBack, remaining)
 		});
 	}
-	
-	
 
-};
+	waitForConfirmation(orderId, successCallBack, remaining) {
+		if (remaining <= 1) {
+			uni.showToast({ icon: 'none', title: '支付结果确认中，请稍后查看缴费记录', duration: 3000 });
+			return;
+		}
+		setTimeout(() => this.confirmPayment(orderId, successCallBack, remaining - 1), 1500);
+	}
+}
 
 module.exports = new WexinPayFactory();

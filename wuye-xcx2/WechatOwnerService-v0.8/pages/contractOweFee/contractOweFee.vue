@@ -224,7 +224,7 @@
 								orderInfo: orderInfo, //微信、支付宝订单数据
 								success: function(res) {
 									uni.showToast({
-										title: "支付成功",
+										title: "支付结果确认中",
 										duration: 2000
 									});
 									uni.navigateBack({});
@@ -288,7 +288,7 @@
 								'paySign': data.sign,
 								'success': function(res) {
 									uni.showToast({
-										title: "支付成功",
+										title: "支付结果确认中",
 										duration: 2000
 									});
 									uni.navigateBack({});

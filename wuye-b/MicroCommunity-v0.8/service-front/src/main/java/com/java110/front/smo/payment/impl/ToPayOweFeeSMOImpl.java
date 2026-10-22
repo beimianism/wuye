@@ -120,7 +120,7 @@ public class ToPayOweFeeSMOImpl extends AppAbstractComponentSMO implements IToPa
         tmpParamIn.put("userId", pd.getUserId());
         tmpParamIn.put("appType", appType);
         responseEntity = super.getOwnerAppUser(pd, restTemplate, tmpParamIn);
-        logger.debug("查询用户信息返回报文：" + responseEntity);
+
         if (responseEntity.getStatusCode() != HttpStatus.OK) {
             throw new IllegalArgumentException("未查询用户信息异常" + tmpParamIn);
         }
@@ -141,6 +141,9 @@ public class ToPayOweFeeSMOImpl extends AppAbstractComponentSMO implements IToPa
         IPayAdapt tPayAdapt = ApplicationContextFactory.getBean(payAdapt, IPayAdapt.class);
         Map result = tPayAdapt.java110Payment(outRestTemplate, paramIn.getString("feeName"), paramIn.getString("tradeType"),
                 orderId, money, openId, smallWeChatDto,wechatAuthProperties.getOweFeeNotifyUrl());
+        if ("0".equals(result.get("code")) && "wechatPayAdapt".equals(payAdapt)) {
+            com.java110.front.smo.payment.adapt.wechatPay.WechatPayCallbackValidator.bindOwner(orderId, pd.getUserId());
+        }
         responseEntity = new ResponseEntity(JSONObject.toJSONString(result), HttpStatus.OK);
         if (!"0".equals(result.get("code"))) {
             return responseEntity;
@@ -151,7 +154,8 @@ public class ToPayOweFeeSMOImpl extends AppAbstractComponentSMO implements IToPa
         saveFees.put("roomId", paramIn.getString("roomId"));
         saveFees.put("communityId", paramIn.getString("communityId"));
         saveFees.put("fees", fees);
-        CommonCache.setValue(FeeDto.REDIS_PAY_OWE_FEE + orderId, saveFees.toJSONString(), CommonCache.PAY_DEFAULT_EXPIRE_TIME);
+        // 微信通知可能延迟或重发；待销账数据必须保留到业务确认完成。
+        CommonCache.setValue(FeeDto.REDIS_PAY_OWE_FEE + orderId, saveFees.toJSONString());
         return responseEntity;
     }
 

@@ -6,10 +6,6 @@ import com.java110.utils.exception.NoAuthorityException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -120,7 +116,7 @@ public class PayUtil {
         while (it.hasNext()) {
             Map.Entry entry = (Map.Entry) it.next();
             String k = (String) entry.getKey();
-            if (entry.getValue() != null || !"".equals(entry.getValue())) {
+            if (entry.getValue() != null && !"".equals(entry.getValue())) {
                 String v = String.valueOf(entry.getValue());
                 if (null != v && !"".equals(v) && !"sign".equals(k) && !"key".equals(k)) {
                     sb.append(k + "=" + v + "&");
@@ -128,7 +124,6 @@ public class PayUtil {
             }
         }
         sb.append("key=" + key);
-        logger.debug("加密前串：" + sb.toString());
         String sign = md5(sb.toString()).toUpperCase();
         return sign;
     }
@@ -159,7 +154,9 @@ public class PayUtil {
         try {
             Map<String, Object> data = new HashMap<String, Object>();
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-//防止XXE攻击
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            documentBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            documentBuilderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             documentBuilderFactory.setXIncludeAware(false);
             documentBuilderFactory.setExpandEntityReferences(false);
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -239,22 +236,16 @@ public class PayUtil {
      * @return
      */
     public static Map<String, String> xmlStrToMap(String xmlStr) {
-        Map<String, String> map = new HashMap<String, String>();
-        Document doc;
         try {
-            doc = DocumentHelper.parseText(xmlStr);
-            Element root = doc.getRootElement();
-            List children = root.elements();
-            if (children != null && children.size() > 0) {
-                for (int i = 0; i < children.size(); i++) {
-                    Element child = (Element) children.get(i);
-                    map.put(child.getName(), child.getTextTrim());
-                }
+            Map<String, Object> values = getMapFromXML(xmlStr);
+            Map<String, String> map = new HashMap<String, String>();
+            for (Map.Entry<String, Object> entry : values.entrySet()) {
+                map.put(entry.getKey(), String.valueOf(entry.getValue()).trim());
             }
-        } catch (DocumentException e) {
-            e.printStackTrace();
+            return map;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("无效的微信支付 XML 报文", e);
         }
-        return map;
     }
 
     public static String getSceneInfo(String wapUrl, String name) {
@@ -278,9 +269,15 @@ public class PayUtil {
      * @return
      */
     public static String moneyToIntegerStr(Double money) {
-        BigDecimal decimal = new BigDecimal(money);
-        int amount = decimal.multiply(new BigDecimal(100))
-                .setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
+        if (money == null || !Double.isFinite(money) || money <= 0) {
+            throw new IllegalArgumentException("支付金额必须大于零");
+        }
+        BigDecimal decimal = BigDecimal.valueOf(money);
+        int amount = decimal.movePointRight(2)
+                .setScale(0, BigDecimal.ROUND_HALF_UP).intValueExact();
+        if (amount < 1) {
+            throw new IllegalArgumentException("支付金额折算后不足 1 分");
+        }
         return String.valueOf(amount);
     }
 
