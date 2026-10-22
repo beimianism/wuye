@@ -203,7 +203,6 @@ public class OwnerAppLoginSMOImpl extends AbstractFrontServiceSMO implements IOw
 
         ResponseEntity<String> paramOut = outRestTemplate.getForEntity(url, String.class);
 
-        logger.debug("调用微信换去openId " + paramOut);
         if (paramOut.getStatusCode() != HttpStatus.OK) {
             return ResultVo.redirectPage(errorUrl);
 
@@ -218,7 +217,6 @@ public class OwnerAppLoginSMOImpl extends AbstractFrontServiceSMO implements IOw
                 .replace("OPENID", openId);
 
         ResponseEntity<String> userinfo_paramOut = outRestTemplate.getForEntity(userinfo_url, String.class);
-        logger.debug("调用微信换去openId ", userinfo_paramOut);
         if (userinfo_paramOut.getStatusCode() != HttpStatus.OK) {
             return ResultVo.redirectPage("/");
         }

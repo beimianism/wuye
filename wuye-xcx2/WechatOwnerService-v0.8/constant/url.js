@@ -32,6 +32,7 @@ export default {
 	queryFeeByParkingSpace: baseUrl + "app/fee.queryFeeByParkingSpace", //查询物业费用
 	queryFeeByOwner: baseUrl + "app/fee.listFee", //预下单
 	preOrder: baseUrl + "app/payment/toPay", //查询小区
+	paymentStatus: baseUrl + "app/payment/status", // 查询服务端确认的支付结果
 	//临时车缴费
 	preOrderTempCarInout: baseUrl + "/app/payment/toPayTempCarInout",
 	listCommunitys: baseUrl + "app/community.listCommunitys", //查询小区文化

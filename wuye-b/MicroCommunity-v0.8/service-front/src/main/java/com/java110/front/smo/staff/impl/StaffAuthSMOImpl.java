@@ -79,7 +79,6 @@ public class StaffAuthSMOImpl extends AbstractFrontServiceSMO implements IStaffA
 
         ResponseEntity<String> paramOut = outRestTemplate.getForEntity(url, String.class);
 
-        logger.debug("调用微信换去openId ", paramOut);
         if (paramOut.getStatusCode() != HttpStatus.OK) {
             return ResultVo.redirectPage("/");
 
@@ -94,7 +93,6 @@ public class StaffAuthSMOImpl extends AbstractFrontServiceSMO implements IStaffA
 
         paramOut = outRestTemplate.getForEntity(url, String.class);
 
-        logger.debug("调用微信换去openId ", paramOut);
         if (paramOut.getStatusCode() != HttpStatus.OK) {
             return ResultVo.redirectPage("/");
         }

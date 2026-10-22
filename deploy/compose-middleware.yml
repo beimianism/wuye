@@ -1,0 +1,43 @@
+name: wuye-middleware
+
+# Single-host deployment. Run the Java services with host networking as well,
+# because the existing 1Panel MySQL and Redis publish only to 127.0.0.1.
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.13
+    container_name: wuye-zookeeper
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: "2181"
+      ZOOKEEPER_CLIENT_PORT_ADDRESS: "127.0.0.1"
+      ZOOKEEPER_TICK_TIME: "2000"
+      KAFKA_HEAP_OPTS: "-Xms128m -Xmx256m"
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_log:/var/lib/zookeeper/log
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.13
+    container_name: wuye-kafka
+    network_mode: host
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: "1"
+      KAFKA_ZOOKEEPER_CONNECT: "127.0.0.1:2181"
+      KAFKA_LISTENERS: "PLAINTEXT://127.0.0.1:9092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://127.0.0.1:9092"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx512m"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+
+volumes:
+  zookeeper_data:
+  zookeeper_log:
+  kafka_data:

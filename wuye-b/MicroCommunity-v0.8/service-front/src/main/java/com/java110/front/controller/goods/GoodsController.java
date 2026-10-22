@@ -81,8 +81,6 @@ public class GoodsController extends BaseController {
     @RequestMapping(path = "/notify", method = RequestMethod.POST)
     public ResponseEntity<String> notify(@RequestBody String postInfo, HttpServletRequest request) {
 
-        logger.debug("微信支付回调报文" + postInfo);
-
         return goodsToNotifySMOImpl.toNotify(postInfo, request);
 
 

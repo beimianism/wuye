@@ -76,7 +76,10 @@ public class FrontServiceApplicationStart {
     @Bean
     public RestTemplate outRestTemplate() {
         StringHttpMessageConverter m = new StringHttpMessageConverter(Charset.forName("UTF-8"));
-        RestTemplate restTemplate = new RestTemplateBuilder().additionalMessageConverters(m).build();
+        RestTemplate restTemplate = new RestTemplateBuilder()
+                .setConnectTimeout(5000)
+                .setReadTimeout(10000)
+                .additionalMessageConverters(m).build();
         return restTemplate;
     }
 
