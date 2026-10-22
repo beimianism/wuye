@@ -1,6 +1,6 @@
 # 公众号 H5 微信支付接入与部署准备
 
-目标项目：`wuye-feat-local-trim`。支付方案已确定为**普通商户 APIv2，公众号内 H5（JSAPI）优先**；小程序共用服务端下单和通知代码，但不是本次上线主入口。微信内 JSAPI 与微信外浏览器的 H5/MWEB 是不同产品；本次不接 MWEB。APIv2 仍有官方接口文档，不能简单视为全面停用：[JSAPI 开发指引](https://pay.weixin.qq.com/doc/v2/merchant/4011935209)。
+目标项目：`haixiang718/wuye` 的 `feat/payment-deploy-20261022` 分支。支付方案已确定为**普通商户 APIv2，公众号内 H5（JSAPI）优先**；小程序共用服务端下单和通知代码，但不是本次上线主入口。微信内 JSAPI 与微信外浏览器的 H5/MWEB 是不同产品；本次不接 MWEB。APIv2 仍有官方接口文档，不能简单视为全面停用：[JSAPI 开发指引](https://pay.weixin.qq.com/doc/v2/merchant/4011935209)。
 
 ## 当前实现
 
@@ -11,7 +11,7 @@
 
 ## 上线前仍须完成
 
-**当前不能宣称可以真实收款。** 项目没有真实商户配置和公网环境，本机也没有 Java/Maven，未做 Java 编译及真机联调。尤其支付订单、待销账明细和已支付标记目前仍存 Redis。Redis 丢数据，或业务服务已成功而前端服务在写支付标记前崩溃，可能造成状态不可恢复或重复销账。上线前需把订单与支付流水、通知幂等状态落库，按唯一 `out_trade_no` 和 `transaction_id` 做数据库级幂等，并用微信查单/对账补偿。欠费销账业务也要以订单号在持久层保证只执行一次。当前代码只提供运行期间的重复通知保护。
+**当前不能宣称可以真实收款。** 代码和 H5 已部署到公网 HTTPS，Java 编译与定向测试通过，但服务器没有正式商户号和 APIv2 密钥，未做真实扣款联调。尤其支付订单、待销账明细和已支付标记目前仍存 Redis。Redis 丢数据，或业务服务已成功而前端服务在写支付标记前崩溃，可能造成状态不可恢复或重复销账。上线前需把订单与支付流水、通知幂等状态落库，按唯一 `out_trade_no` 和 `transaction_id` 做数据库级幂等，并用微信查单/对账补偿。欠费销账业务也要以订单号在持久层保证只执行一次。当前代码只提供运行期间的重复通知保护。
 
 另需核验旧配置 `application-prod.yml` 中 `prod.*.java110.com` 服务地址、演示 SQL 中 `HC_ENV=DEV`、其他费用类型（如出租、商品）的旧回调实现。当前重点核验了普通缴费和欠费两个入口，其他入口不能据此视为已完成支付安全改造。
 
@@ -53,6 +53,6 @@
 
 测试号凭据保存在项目根目录的 `.env.wechat-test.local`，文件权限为 `0600` 且被 Git 忽略。它设置公众号登录所需的 `WECHAT_OFFICIAL_ACCOUNT_APP_ID`、`WECHAT_OFFICIAL_ACCOUNT_APP_SECRET`，以及 `WUYE_H5_ORIGIN=https://luci-ona.site` 作为本地测试目标；不设置商户号或支付密钥。启动本地 `service-front` 的同一个终端先执行 `source .env.wechat-test.local`。H5 页面入口 URL 通过 `wAppId=<测试号 AppID>` 传入公开的 AppID；`conf/config.js` 不固化测试号，避免生产构建误用。
 
-域名待核验：当前执行环境无法解析该域名，外部网页检查也未能取得 HTTPS 响应，因此**尚未验证 DNS 指向、TLS 证书或应用路由**。待域名指向实际服务器且 HTTPS 可访问时，公众号测试号后台的网页授权域名填 `luci-ona.site`（不带协议和路径）；正式支付商户平台的 JSAPI 授权目录按当前 H5 单页应用可先设为 `https://luci-ona.site/`，再用真实付款页面验证目录匹配。支付通知地址须按上表在真实服务器开放。
+2026-10-22 已在服务器验证 `luci-ona.site` 的 HTTPS 站点和应用路由。公众号测试号后台的网页授权域名填 `luci-ona.site`（不带协议和路径）；正式支付商户平台的 JSAPI 授权目录按当前 H5 单页应用可先设为 `https://luci-ona.site/`，再用真实付款页面验证目录匹配。支付通知地址已由公网反向代理开放。
 
-已在本地运行 H5 桥接与状态轮询测试、业主端本地功能测试、Python 配置测试。真实公众号 OAuth 还需要在测试号后台配置可访问的网页授权域名，并在微信内打开 HTTPS 页面；当前机器没有 Java/Maven 和公网回调域名，因此本地测试不等于已完成 OAuth 或支付联调。公众号接口测试号不能替代已认证并绑定商户号的正式公众号进行真实 JSAPI 支付；`wechatpay-dev-cli` 主要面向 APIv3 查单排障，也不能直接代替本项目的 APIv2 统一下单联调。[APIv2 JSAPI 接入准备](https://pay.wechatpay.cn/doc/v2/merchant/4011935208)、[微信支付开发 CLI](https://pay.wechatpay.cn/doc/v3/merchant/4019638116)。
+已运行 H5 桥接与状态轮询测试、业主端本地功能测试、Python 配置测试；服务器 Java 打包及支付未配置拒绝、公众号 OAuth 定向测试通过。此前测试号已完成一次手机微信授权登录与账单查看；本次重新部署后仍需真机回归，不等于完成正式商户支付联调。公众号接口测试号不能替代已认证并绑定商户号的正式公众号进行真实 JSAPI 支付；`wechatpay-dev-cli` 主要面向 APIv3 查单排障，也不能直接代替本项目的 APIv2 统一下单联调。[APIv2 JSAPI 接入准备](https://pay.wechatpay.cn/doc/v2/merchant/4011935208)、[微信支付开发 CLI](https://pay.wechatpay.cn/doc/v3/merchant/4019638116)。
