@@ -22,8 +22,10 @@ import com.java110.core.context.IPageData;
 import com.java110.core.context.PageData;
 import com.java110.core.factory.AuthenticationFactory;
 import com.java110.core.factory.WechatFactory;
+import com.java110.dto.app.AppDto;
 import com.java110.dto.smallWeChat.SmallWeChatDto;
 import com.java110.dto.smallWechatAttr.SmallWechatAttrDto;
+import com.java110.front.properties.WechatAuthProperties;
 import com.java110.front.smo.wechatGateway.IWechatGatewaySMO;
 import com.java110.utils.cache.MappingCache;
 import com.java110.utils.constant.WechatConstant;
@@ -42,8 +44,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @ClassName WechatController
@@ -62,27 +67,42 @@ public class WechatGatewayController extends BaseController {
     @Autowired
     private IWechatGatewaySMO wechatGatewaySMOImpl;
 
+    @Autowired
+    private WechatAuthProperties wechatAuthProperties;
+
 
     /**
      * 微信登录接口
      *
      * @param request
      */
-    @RequestMapping(path = "/gateway", method = RequestMethod.GET)
+    @RequestMapping(path = {"/gateway", "/testCallback"}, method = RequestMethod.GET)
     public ResponseEntity<String> gateway(HttpServletRequest request) {
 
-        String token = MappingCache.getValue(WechatConstant.WECHAT_DOMAIN, WechatConstant.TOKEN);
+        boolean testCallback = isTestCallback(request);
+        String token = testCallback ? wechatAuthProperties.getCallbackToken()
+                : MappingCache.getValue(WechatConstant.WECHAT_DOMAIN, WechatConstant.TOKEN);
+        if (testCallback && (StringUtil.isEmpty(token) || StringUtil.isEmpty(wechatAuthProperties.getWechatAppId()))) {
+            return new ResponseEntity<>("公众号测试号回调未配置", HttpStatus.SERVICE_UNAVAILABLE);
+        }
         String signature = request.getParameter("signature");
         String timestamp = request.getParameter("timestamp");
         String nonce = request.getParameter("nonce");
         String echostr = request.getParameter("echostr");
         String wId = request.getParameter(WechatConstant.PAGE_WECHAT_APP_ID);
         String java110AppId = request.getParameter("java110AppId");
-        if (!StringUtil.isEmpty(wId)) {
+        if (!testCallback && !StringUtil.isEmpty(wId)) {
             wId = wId.replace(" ", "+");
             token = getToken(java110AppId, wId);
         }
         String responseStr = "";
+        if (testCallback) {
+            if (StringUtil.isEmpty(echostr) || echostr.length() > 1024
+                    || !validSignature(token, signature, timestamp, nonce)) {
+                return new ResponseEntity<>("微信签名校验失败", HttpStatus.FORBIDDEN);
+            }
+            return new ResponseEntity<>(echostr, HttpStatus.OK);
+        }
         String sourceString = "";
         String[] ss = new String[]{token, timestamp, nonce};
         Arrays.sort(ss);
@@ -111,20 +131,29 @@ public class WechatGatewayController extends BaseController {
      *
      * @param request
      */
-    @RequestMapping(path = "/gateway", method = RequestMethod.POST)
+    @RequestMapping(path = {"/gateway", "/testCallback"}, method = RequestMethod.POST)
     public ResponseEntity<String> gateway(@RequestBody String param, HttpServletRequest request) {
 
-        String token = MappingCache.getValue(WechatConstant.WECHAT_DOMAIN, WechatConstant.TOKEN);
+        boolean testCallback = isTestCallback(request);
+        String token = testCallback ? wechatAuthProperties.getCallbackToken()
+                : MappingCache.getValue(WechatConstant.WECHAT_DOMAIN, WechatConstant.TOKEN);
+        if (testCallback && (StringUtil.isEmpty(token) || StringUtil.isEmpty(wechatAuthProperties.getWechatAppId()))) {
+            return new ResponseEntity<>("公众号测试号回调未配置", HttpStatus.SERVICE_UNAVAILABLE);
+        }
         String signature = request.getParameter("signature");
         String timestamp = request.getParameter("timestamp");
         String nonce = request.getParameter("nonce");
         String openId = request.getParameter("openid");
-        String java110AppId = request.getParameter("java110AppId");
+        String java110AppId = testCallback ? AppDto.WECHAT_OWNER_APP_ID : request.getParameter("java110AppId");
         String responseStr = "";
-        String wId = request.getParameter(WechatConstant.PAGE_WECHAT_APP_ID);
-        if (!StringUtil.isEmpty(wId)) {
+        String wId = testCallback ? WechatFactory.getWId(wechatAuthProperties.getWechatAppId())
+                : request.getParameter(WechatConstant.PAGE_WECHAT_APP_ID);
+        if (!testCallback && !StringUtil.isEmpty(wId)) {
             wId = wId.replace(" ", "+");
             token = getToken(java110AppId, wId);
+        }
+        if (testCallback && !validSignature(token, signature, timestamp, nonce)) {
+            return new ResponseEntity<>("微信签名校验失败", HttpStatus.FORBIDDEN);
         }
         ResponseEntity<String> responseEntity = null;
         String sourceString = "";
@@ -135,7 +164,7 @@ public class WechatGatewayController extends BaseController {
         }
         String signature1 = AuthenticationFactory.SHA1Encode(sourceString).toLowerCase();
         try {
-            if (!signature1.equals(signature)) {
+            if (!signature1.equalsIgnoreCase(signature)) {
                 responseStr = "亲，非法访问，签名失败";
                 return new ResponseEntity<String>(responseStr, HttpStatus.OK);
             }
@@ -211,5 +240,22 @@ public class WechatGatewayController extends BaseController {
         }
 
         return token;
+    }
+
+    private static boolean isTestCallback(HttpServletRequest request) {
+        return "/app/wechat/testCallback".equals(request.getRequestURI());
+    }
+
+    private static boolean validSignature(String token, String signature, String timestamp, String nonce) {
+        if (StringUtil.isEmpty(token) || StringUtil.isEmpty(signature)
+                || StringUtil.isEmpty(timestamp) || StringUtil.isEmpty(nonce)
+                || !signature.matches("[0-9a-fA-F]{40}") || timestamp.length() > 32 || nonce.length() > 128) {
+            return false;
+        }
+        String[] parts = new String[]{token, timestamp, nonce};
+        Arrays.sort(parts);
+        String expected = AuthenticationFactory.SHA1Encode(parts[0] + parts[1] + parts[2]).toLowerCase(Locale.ROOT);
+        return MessageDigest.isEqual(expected.getBytes(StandardCharsets.US_ASCII),
+                signature.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.US_ASCII));
     }
 }

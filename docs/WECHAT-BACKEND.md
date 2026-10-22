@@ -29,6 +29,8 @@ java110.auth.wechat.wechatAppSecret=<测试号AppSecret>
 https://<临时域名>/wechat-test/callback
 ```
 
+上面是旧的**本地隧道**入口。固定服务器 `luci-ona.site` 的测试号「接口配置信息 → URL」现在填写 `https://luci-ona.site/app/wechat/testCallback`，Token 与服务器私有配置 `WECHAT_OFFICIAL_ACCOUNT_CALLBACK_TOKEN` 完全一致。此接口 GET 校验微信签名并原样返回 `echostr`；POST 用服务器配置的测试号 AppID 和业主公众号内部应用 ID 进入现有消息处理，不接受外部查询参数覆盖账号。旧 `/wechat-test/callback` 未部署在固定服务器上。
+
 入口对 GET 使用本地 Token 校验 SHA1 签名并直接返回明文 echostr，减少后台调用延迟；POST 转发至本地配置中的原后台路径，内部应用 ID 和 wId 不允许由外部查询参数覆盖。原后台路径为：
 
 ```text

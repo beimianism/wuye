@@ -3,8 +3,8 @@
         data: {
             loginInfo: {
                 logo: '',
-                username: 'wuxw',
-                passwd: 'admin',
+                username: '',
+                passwd: '',
                 validateCode: '',
                 errorInfo: ''
             }
@@ -92,7 +92,7 @@
                         }
                         if (res.status == 200) {
                             vc.emit('initData', 'loadCommunityInfo', {
-                                url: '/'
+                                url: '/admin.html'
                             });
                             return;
                         }
@@ -107,7 +107,7 @@
 
             },
             _doRegister: function () {
-                vc.jumpToPage('/user.html#/pages/frame/register');
+                vc.jumpToPage('/staff-login.html#/pages/frame/register');
             }
         },
         _destroyedMethod: function () {

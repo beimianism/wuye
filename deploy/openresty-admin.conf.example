@@ -1,0 +1,18 @@
+# Include inside the existing luci-ona.site HTTPS server block.
+# Store a privately generated htpasswd file outside the document root.
+location = /admin.html {
+    root /www/sites/wuye-h5/index;
+    auth_basic "WuYe Admin";
+    auth_basic_user_file /www/sites/wuye-h5/admin.htpasswd;
+    try_files $uri =404;
+}
+
+location = /staff-login.html {
+    root /www/sites/wuye-h5/index;
+    auth_basic "WuYe Admin";
+    auth_basic_user_file /www/sites/wuye-h5/admin.htpasswd;
+    try_files $uri =404;
+}
+
+# Add the same two auth_basic directives to the existing /callComponent/ proxy
+# location. Do not duplicate that location block.

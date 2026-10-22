@@ -71,7 +71,7 @@
                     },
                     function (json, res) {
                         if (res.status == 200) {
-                            vc.jumpToPage("/user.html#/pages/frame/login");
+                            vc.jumpToPage("/staff-login.html#/pages/frame/login");
                             return;
                         }
                     }, function () {

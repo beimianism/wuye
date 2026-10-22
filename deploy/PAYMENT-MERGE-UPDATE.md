@@ -36,5 +36,7 @@ git merge origin/feat/wechat-test-integration
 - 全量 Maven `package` 成功；支付未配置拒绝测试 1 项、公众号 OAuth 测试 11 项通过。H5 支付测试、本地业主测试和配置测试已通过。测试号 AppID 仅在与服务器外置 AppID 完全相同时使用外置公众号配置，修复了传入 `w-app-id` 后被错误要求数据库记录的问题；新前台 JAR 已部署，线上 `/app/refreshToken` 返回相同 AppID 与 `luci-ona.site` 回调域名。
 - 业主 H5 已部署；从服务器外验证 TLS、`/`、`/user.html`、CSS 和 JavaScript 资源均正常。七个支付链路服务在 Eureka 注册；未登录支付状态查询返回 401；普通缴费和欠费通知从公网收到无效 XML 均返回微信格式的 `FAIL`。本次仅启动支付所需七个业务服务，`job`、`report`、`goods` 等其他业务服务尚未启动。
 - 服务器前台服务环境变量尚未配置正式商户号和 APIv2 密钥，数据库商户记录尚未核验；H5 `paymentEnabled:false`，没有执行真实 JSAPI 扣款。订单与通知幂等状态仍依赖 Redis，持久流水、数据库唯一约束和微信查单补偿尚未实现。现阶段是支付代码与基础链路部署，不能作为正式收款验收。
-- 管理后台独立 Web 源码尚未部署到当前公网站点；`/admin.html` 和管理后台所需 `/css/` 路径当前返回 404。线上仅运行支付链路需要的部分业务服务，因此不能以现有站点作为完整管理后台验收。
+- 管理后台静态页面已与业主 H5 共用站点，入口为 `/staff-login.html`、`/admin.html`；保留业主 `/user.html`，通过独立 HTTP Basic Auth 保护后台入口和 `/callComponent/` 代理。公网验证后台入口未认证 401、认证 200、后台登录元信息接口认证 200、业主 H5 200；尚未完成真实管理员账号登录及所有管理模块操作验收。后台入口更新可执行 `deploy/deploy-admin-static.sh /opt/1panel/www/sites/wuye-h5/index`，认证文件和 OpenResty 规则需在服务器私有配置中保留。
+- 测试号服务器校验已迁移到 `/app/wechat/testCallback`，Token 仅在服务器 `wechat.env`；公网签名正确的 GET 返回原样 `echostr` 与 HTTP 200，缺少签名返回 403。旧本地隧道 `/wechat-test/callback` 在固定站点返回 404，不应再填入平台。已运行回调测试 3 项与公众号 OAuth 测试 11 项。
+- 后台社区列表联调发现 MySQL `ONLY_FULL_GROUP_BY` 与旧查询不兼容，已只修改 `getCommunityInfoNew` 的分组字段并重建、重启 `community`。其后列表查询还依赖 `common-service` 获取城市名称。曾临时启动 `common` 验证依赖，但服务器 3.6 GiB 内存、3 GiB 交换空间几乎用尽，已将其停止；当前维持七个支付链路业务服务。后台静态入口和登录元信息可访问，社区列表与依赖 `common` 的后台页面不构成线上验收。后续业务回归优先在本地进行，扩容后再决定是否部署更多服务。
 - GitHub 推送因当前环境没有写入认证失败；功能分支保留在本地工作副本。工作区另有 `modules/wechatpay-integration/patches/wuye-payment-integration-20261022.patch` 和 `apply-upstream.sh`，已在 `feat/wechat-test-integration` 基线工作树实际应用并与功能分支逐字节比对通过。

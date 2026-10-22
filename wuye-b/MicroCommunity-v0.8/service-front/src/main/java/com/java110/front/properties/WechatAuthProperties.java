@@ -34,6 +34,7 @@ public class WechatAuthProperties {
 
     private String wechatAppId;//微信公众号ID
     private String wechatAppSecret;//微信公众号秘钥
+    private String callbackToken;//公众号测试号消息回调校验 Token
 
     private String sendMsgUrl;//微信公众号推送模板信息链接
 
@@ -115,6 +116,14 @@ public class WechatAuthProperties {
 
     public void setWechatAppSecret(String wechatAppSecret) {
         this.wechatAppSecret = wechatAppSecret;
+    }
+
+    public String getCallbackToken() {
+        return callbackToken;
+    }
+
+    public void setCallbackToken(String callbackToken) {
+        this.callbackToken = callbackToken;
     }
 
     public String getSendMsgUrl() {

@@ -55,7 +55,7 @@
                             vc.component.clearCacheData();
                             vc.component._loadSysInfo();
                             vc.emit('initData', 'loadCommunityInfo', {
-                                url: '/'
+                                url: '/admin.html'
                             });
                             return;
                         }

@@ -137,7 +137,7 @@
                              function(json,res){
                                 //vm.menus = vm.refreshMenuActive(JSON.parse(json),0);
                                 if(res.status == 200){
-                                    vc.jumpToPage("/user.html#/pages/frame/login");
+                                    vc.jumpToPage("/staff-login.html#/pages/frame/login");
                                     return ;
                                 }
                                 vc.toast(json);
@@ -160,7 +160,7 @@
                 }
             },
             _doLogin:function(){
-                vc.jumpToPage('/user.html#/pages/frame/login');
+                vc.jumpToPage('/staff-login.html#/pages/frame/login');
             }
         }
     });
