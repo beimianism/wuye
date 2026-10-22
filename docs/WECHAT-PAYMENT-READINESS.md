@@ -53,7 +53,7 @@
 
 测试号凭据保存在项目根目录的 `.env.wechat-test.local`，文件权限为 `0600` 且被 Git 忽略。它设置公众号登录所需的 `WECHAT_OFFICIAL_ACCOUNT_APP_ID`、`WECHAT_OFFICIAL_ACCOUNT_APP_SECRET`，以及 `WUYE_H5_ORIGIN=https://luci-ona.site` 作为本地测试目标；不设置商户号或支付密钥。启动本地 `service-front` 的同一个终端先执行 `source .env.wechat-test.local`。H5 页面入口 URL 通过 `wAppId=<测试号 AppID>` 传入公开的 AppID；`conf/config.js` 不固化测试号，避免生产构建误用。
 
-2026-10-22 已在服务器验证 `luci-ona.site` 的 HTTPS 站点和应用路由；用户已确认该域名完成备案。公众号测试号后台的网页授权域名填 `luci-ona.site`（不带协议和路径）；正式公众号仍需独立配置网页授权域名。正式支付商户平台的 JSAPI 授权目录按当前 H5 单页应用可先设为 `https://luci-ona.site/`，再用真实付款页面验证目录匹配。支付通知地址已由公网反向代理开放。
+2026-10-22 已在服务器验证 `luci-ona.site` 的 HTTPS 站点和应用路由；用户已确认该域名完成备案且拥有完整域名管理权限。公众号测试号后台的网页授权域名填 `luci-ona.site`（不带协议和路径）；正式公众号仍需独立配置网页授权域名。正式支付商户平台的 JSAPI 授权目录按当前 H5 单页应用可先设为 `https://luci-ona.site/`，再用真实付款页面验证目录匹配。支付通知地址已由公网反向代理开放。
 
 遇到微信 `redirect_uri` 域名不一致（10003）时，进入**该测试号 AppID 对应**的测试平台「网页授权获取用户基本信息」，将授权回调页面域名改为 `luci-ona.site` 并保存。此项与「JS 接口安全域名」、消息接口 URL/Token、商户平台 JSAPI 支付授权目录是不同配置；旧的 Pinggy 域名不适用于当前站点。服务端已验证生成的 OAuth `redirect_uri` 为 `https://luci-ona.site/app/loginOwnerWechatAuth?...`，且 OAuth URL 使用测试号 AppID。若平台已保存正确域名但仍报 10003，应从 `https://luci-ona.site/` 重新打开入口，并核对当前页面 URL 与 OAuth URL 的 `appid`、`redirect_uri`，避免沿用旧临时入口或缓存的账号链接。[微信支付官方 10003 排查](https://pay.weixin.qq.com/doc/v2/merchant/4011935211)。
 
